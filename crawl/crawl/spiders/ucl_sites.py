@@ -10,29 +10,19 @@ class SitesSpider(CrawlSpider):
     allowed_domains = ['www.cs.ucl.ac.uk']
     start_urls = ['http://www.cs.ucl.ac.uk']
     rules = (
-        Rule(SgmlLinkExtractor(allow=('www.cs.ucl.ac.uk',)) , callback='parse_items'),
+        Rule(SgmlLinkExtractor(allow=('www.cs.ucl.ac.uk',)) , callback='parse_items', follow=True),
     )
-
     def parse_items(self, response):
-        extractor = LinkExtractor()
-        links = extractor.extract_links(response)
+        hxs = HtmlXPathSelector(response)
+        titles = hxs.xpath('//div')
+        items = []
         i = 0
-        for link in links:
-            if i > 5:
+        for titles in titles:
+            if i > 0:
                 break
             else:
-                yield{ 
-                'title': response.css("title").extract(),
-                'url:' : link.url
-                    }
-                i = i + 1
-    # def parse_items(self, response):
-    #     hxs = HtmlXPathSelector(response)
-    #     titles = hxs.xpath('//span[@class="pl"]')
-    #     items = []
-    #     for titles in titles:
-    #         item = {}
-    #         item["title"] = titles.xpath("a/text()").extract()
-    #         item["link"] = titles.xpath("a/@href").extract()
-    #         items.append(item)
-    #     return items
+                yield{
+                    'title' : titles.xpath("normalize-space(//title/text())").extract(),
+                    'link' : response.request.url
+                } 
+                i = i+1
