@@ -11,20 +11,11 @@ class SitesSpider(CrawlSpider):
     f = open("url.txt")
     start_urls = [url.strip() for url in f.readlines()]
     f.close()
-    rules = (
-        Rule(SgmlLinkExtractor() , callback='read_content'),
-    )
-    def parse_items(self, response):
+
+    def parse(self, response):
         sel = Selector(response)
         text = ''.join(sel.select("//body//text()").extract()).strip().replace("\r","").replace("\n","").replace("\t","")
-        print("TEXT ------ " + text)
-        i = 0
-        for content in text:
-            if i > 0:
-                break
-            else:
-                yield{
-                    'link' : response.request.url,
-                    'content': text
-                } 
-                i = i+1
+        yield{
+        'content': text.strip(),
+        'link' : response.request.url,
+        }
