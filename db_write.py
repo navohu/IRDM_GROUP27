@@ -1,8 +1,8 @@
 import psycopg2
 import sys
+import json
 
 con = None
-import json
 
 with open("./crawl/cs.json") as data_file:    
     data = json.load(data_file)
@@ -13,10 +13,12 @@ try:
     
     cur = con.cursor()
     
-    cur.execute("CREATE TABLE cs_sites(Title VARCHAR(20), Link VARCHAR(20))")
-    
+    cur.execute("DROP TABLE cs_sites")
+    cur.execute("CREATE TABLE cs_sites(Id INTEGER PRIMARY KEY, Title VARCHAR(20), Link VARCHAR(20))")
+    i = 0
     for site in data:
-        cur.execute("INSERT INTO cs_sites VALUES(site["title"],site["link"])")
+        cur.execute("INSERT INTO cs_sites VALUES(%i, %s, %s)", (i, site["title"],site["link"]))
+        i = i+1
     
     
     con.commit()
