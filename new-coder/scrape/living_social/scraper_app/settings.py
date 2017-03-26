@@ -14,9 +14,9 @@ ITEM_PIPELINES = ['scraper_app.pipelines.LivingSocialPipeline']
 
 DATABASE = {
     'drivername': 'postgres',
-    'host': 'localhost',
+    'host': 'searchengineindex.cwbjh0hhu9l3.us-west-2.rds.amazonaws.com',
     'port': '5432',
-    'username': 'YOUR_USERNAME',  # fill in your username here
-    'password': 'YOUR_PASSWORD',  # fill in your password here
+    'username': 'group27',  # fill in your username here
+    'password': '',  # fill in your password here
     'database': 'scrape'
 }
