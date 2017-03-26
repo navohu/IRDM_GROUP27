@@ -1,8 +1,8 @@
 import scrapy
 import re
-from scrapy.linkextractors import LinkExtractor
+from scrapy.contrib.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider,Rule
-from scrapy.linkextractors.sgml import SgmlLinkExtractor
+from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.selector import HtmlXPathSelector
 
 import psycopg2
@@ -34,8 +34,9 @@ try:
                 if i > 0:
                     break
                 else:
-                    cur.execute("INSERT INTO Sites VALUES(titles.xpath("normalize-space(//title/text())").extract(),response.request.url)")
-                    cur.execute("INSERT INTO Sites VALUES('Audi',52642)")
+                    title = titles.xpath("normalize-space(//title/text())").extract()
+                    link = response.request.url
+                    cur.execute("INSERT INTO Sites VALUES(title,link)")
                     # yield{
                     #     'title' : titles.xpath("normalize-space(//title/text())").extract(),
                     #     'link' : response.request.url
@@ -44,11 +45,11 @@ try:
 
 except psycopg2.DatabaseError, e:
 
-if con:
-    con.rollback()
+    if con:
+        con.rollback()
 
-print 'Error %s' % e    
-sys.exit(1)
+    print 'Error %s' % e    
+    sys.exit(1)
     
     
 finally:
