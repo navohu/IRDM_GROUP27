@@ -14,10 +14,10 @@ try:
     cur = con.cursor()
     
     cur.execute("DROP TABLE cs_sites")
-    cur.execute("CREATE TABLE cs_sites(Id INTEGER PRIMARY KEY, Title VARCHAR(20), Link VARCHAR(20))")
+    cur.execute("CREATE TABLE cs_sites(Id INTEGER PRIMARY KEY, Title VARCHAR(1000), Link VARCHAR(1000))")
     i = 0
     for site in data:
-        cur.execute("INSERT INTO cs_sites VALUES(%i, %s, %s)", (i, site["title"],site["link"]))
+        cur.execute("INSERT INTO cs_sites VALUES(%s, %s, %s)", (i, site["title"],site["link"]))
         i = i+1
     
     
