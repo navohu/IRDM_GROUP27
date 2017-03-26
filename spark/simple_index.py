@@ -1,4 +1,8 @@
 from pyspark import SparkContext
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+
+#import psycopg2
+#import sys
 
 def addSourceID(word, nextID):
 	return (word, (nextID, 1))
@@ -27,6 +31,13 @@ class InvertedIndex:
 
 		print self.invertedIndex.collect()
 
-	def writeToDatabase():
-		# TODO
-		pass
+	def writeToDatabase(self, sqlContext, url, properties):
+		# TODO: split into dictionary and word occurrences tables
+		test_schema = StructType(\
+			[StructField("word", StringType(), True), \
+			 StructField("occurrences", StringType(), True)])
+		invertedIndexStrings = self.invertedIndex.map(lambda kv_pair: (kv_pair[0], str(kv_pair[1])))
+		
+		test_df = sqlContext.createDataFrame(invertedIndexStrings, test_schema)
+		test_df.write.jdbc(url=url, table="index_test", mode="overwrite", properties=properties)
+		
