@@ -42,36 +42,27 @@ class InvertedIndex:
 		print self.invertedIndex.collect()
 
 	def writeToDatabase(self, sqlContext, url, properties):
-                #sqlContext.sql("CREATE TABLE IF NOT EXISTS dictionary(word VARCHAR, wordID BIGINT)")
-                #sqlContext.sql("CREATE TABLE IF NOT EXISTS word_occurrences(word VARCHAR, wordID BIGINT, documentID BIGINT, occurrences INTEGER)")
-                
                 dictionary_schema = StructType(\
-                    [StructField("word", StringType(), True)])
-                word_occurrence_schema = StructType(\
-                        [StructField("word", StringType(), True), \
-                        StructField("documentID", LongType(), True), \
-                        StructField("occurrences", IntegerType(), True)])
-                # TODO: column of word_occcurrence_schema
-                #[StructField("wordID", LongType(), True), \
-                
-                test_schema = StructType(\
-			[StructField("word", StringType(), True), \
-			 StructField("occurrences", StringType(), True)])
-                
-		invertedIndexStrings = self.invertedIndex.map(lambda kv_pair: (kv_pair[0], str(kv_pair[1])))
-                test_df = sqlContext.createDataFrame(invertedIndexStrings, test_schema)
-		test_df.write.jdbc(url=url, table="index_test", mode="overwrite", properties=properties)
-                
-                word_occurrence = self.invertedIndex.flatMap(splitTuple)
-                print 'word occurrence',  word_occurrence.collect()
-                word_occurrence_df = sqlContext.createDataFrame(word_occurrence, word_occurrence_schema)
-                word_occurrence_df.write.jdbc(url=url, table="word_occurrences", mode="overwrite", properties=properties)
+                    [StructField("word", StringType(), False)])
 
-	        dictionary = self.invertedIndex.map(lambda kv_pair: (kv_pair[0],))
-		dictionary_df = sqlContext.createDataFrame(dictionary, dictionary_schema).withColumn("wordID", monotonically_increasing_id())
-                print 'dictionary_df', dictionary_df.collect()
+                word_occurrence_schema = StructType(\
+                        [StructField("word", StringType(), False), \
+                        StructField("document_id", LongType(), False), \
+                        StructField("occurrences", IntegerType(), True)])
+
+                dictionary = self.invertedIndex.map(lambda kv_pair: (kv_pair[0],))
+		dictionary_df = sqlContext.createDataFrame(dictionary, dictionary_schema).withColumn("word_id", monotonically_increasing_id())
                 print 'dictionary_df take 1', dictionary_df.take(1)
                 dictionary_df.write.jdbc(url=url, table="dictionary", mode="overwrite", properties=properties)
 
+                word_occurrence = self.invertedIndex.flatMap(splitTuple)
+                print 'word occurrence',  word_occurrence.take(1)
+                word_occurrence_df = sqlContext.createDataFrame(word_occurrence, word_occurrence_schema)
 
-                		
+                sqlContext.registerDataFrameAsTable(dictionary_df, "dict")
+                sqlContext.registerDataFrameAsTable(word_occurrence_df, "word_occ")
+
+                # Use word_id column from dictionary
+                word_occurrence_with_ids = word_occurrence_df.join(dictionary_df, word_occurrence_df.word == dictionary_df.word) \
+                        .select("word_id", "document_id", "occurrences")
+                word_occurrence_with_ids.write.jdbc(url=url, table="word_occurrences", mode="overwrite", properties=properties)
