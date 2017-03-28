@@ -1,3 +1,4 @@
+
 # Python
 *.pyc
 
@@ -6,3 +7,7 @@
 
 # Credentials
 spark/properties.py
+
+ENV
+
+mysite
