@@ -9,14 +9,14 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 # Read from url
-resp = urllib2.urlopen('http://ucl.ac.uk')
+resp = urllib2.urlopen('http://www.cs.ucl.ac.uk/news/article/alexandra-silva-wins-eatcs-presburger-award-2017/')
 html = resp.read()
 
 # Convert html to text
 soup = BeautifulSoup(html, 'html.parser')
 [s.extract() for s in soup('script')]
 [s.extract() for s in soup('style')]
-text = soup.get_text()
+text = soup.get_text(" ")
 
 # Stopping
 stop = set(stopwords.words('english'))
