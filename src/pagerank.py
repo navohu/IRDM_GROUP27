@@ -4,7 +4,7 @@ import pandas as pd
 from scipy.sparse import csc_matrix
 import numpy as np
 
-with open("../sitegraph/graphs/trans.json") as data_file:    
+with open("../sitegraph/graphs/cs_sites.json") as data_file:    
     data = json.load(data_file)
 
 graph = {}
@@ -14,6 +14,7 @@ for i in range(0, len(data)):
 
 def getAdjacencyMatrix(g):
     g = {k: [v.strip() for v in vs] for k, vs in g.items()}
+    print "Producing adjacency matrix..."
 
     edges = [(a, b) for a, bs in g.items() for b in bs]
 
@@ -72,4 +73,6 @@ def pageRank(G, s = .85, maxerr = .001):
     # return normalized pagerank
     return r/sum(r)
 
-print pageRank(getAdjacencyMatrix(graph), s=0.86)
+adj_matrix = getAdjacencyMatrix(graph)
+page_rank = pageRank(adj_matrix, s=0.86)
+np.savetxt("pagerank_tables/cs_sites.csv", page_rank, delimiter=",")
