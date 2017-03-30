@@ -1,7 +1,12 @@
 from pyspark import SparkContext
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, LongType
 from pyspark.sql.functions import monotonically_increasing_id
-
+import urllib2
+import traceback
+import html2text
+from bs4 import BeautifulSoup
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
 
 def addSourceID(word, nextID):
 	return (word, (nextID, 1))
@@ -24,6 +29,47 @@ def splitTuple(kv_pair):
                 tuple_list.append((kv_pair[0], kv_pair[1][0], kv_pair[1][1]))
         return tuple_list
 
+
+def getWebsiteText(url):
+    # Read from url
+    try: 
+        resp = urllib2.urlopen(url)
+    except urllib2.HTTPError, e:
+        checksLogger.error('HTTPError = ' + str(e.code))
+    except urllib2.URLError, e:
+        checksLogger.error('URLError = ' + str(e.reason))
+    except httplib.HTTPException, e:
+        checksLogger.error('HTTPException')
+    except Exception:
+        checksLogger.error('generic exception: ' + traceback.format_exc())
+    html = resp.read()
+
+    # Convert html to text
+    soup = BeautifulSoup(html, 'html.parser')
+    [s.extract() for s in soup('script')]
+    [s.extract() for s in soup('style')]
+    text = soup.get_text(' ')
+
+    # Stopping
+    stop = set(stopwords.words('english'))
+    stopped_text = [i for i in text.lower().split() if i not in stop]
+
+    # Stemming
+    porter_stemmer = PorterStemmer()
+    stemmed_text = [porter_stemmer.stem(i) for i in stopped_text]
+    
+    final_string = ""
+    for word in stemmed_text:
+        word = word.replace(u'\00', '')
+        # Split hyphenated words
+        for w in word.split('-'):
+            # Trim punctuation
+            alphanum = filter(unicode.isalnum, w)
+            final_string += alphanum
+            final_string += " "
+    return final_string
+
+
 class InvertedIndex:
 	def __init__(self, sc):
 		self.invertedIndex = sc.emptyRDD()
@@ -41,6 +87,22 @@ class InvertedIndex:
 
 		print self.invertedIndex.collect()
 
+        def indexTable(self, sqlContext, db_url, table, properties):
+            websites_df = sqlContext.read.jdbc(url=db_url, table=table, properties=properties)
+            websites_df = websites_df.select("id", "link")
+
+            websites_rdd = websites_df.rdd.map(lambda r: (r["id"], getWebsiteText(r["link"])))
+
+            websites_rdd = websites_rdd.flatMapValues(lambda text: text.split())
+            print websites_rdd.take(1)
+
+            websites_rdd = websites_rdd \
+                    .map(lambda kv_pair: addSourceID(kv_pair[1], kv_pair[0])) \
+                    .reduceByKey(lambda a, b: (a[0], a[1]+b[1]))
+
+            self.invertedIndex = websites_rdd.reduceByKey(lambda a, b: (a,b)) \
+                    .map(lambda kv_pair: (kv_pair[0], flattenTuple(kv_pair[1])))
+
 	def writeToDatabase(self, sqlContext, url, properties):
                 dictionary_schema = StructType(\
                     [StructField("word", StringType(), False)])
@@ -53,7 +115,7 @@ class InvertedIndex:
                 dictionary = self.invertedIndex.map(lambda kv_pair: (kv_pair[0],))
 		dictionary_df = sqlContext.createDataFrame(dictionary, dictionary_schema).withColumn("word_id", monotonically_increasing_id())
                 print 'dictionary_df take 1', dictionary_df.take(1)
-                dictionary_df.write.jdbc(url=url, table="dictionary", mode="overwrite", properties=properties)
+                dictionary_df.write.jdbc(url=url, table="cs_dictionary_2", mode="overwrite", properties=properties)
 
                 word_occurrence = self.invertedIndex.flatMap(splitTuple)
                 print 'word occurrence',  word_occurrence.take(1)
@@ -65,4 +127,4 @@ class InvertedIndex:
                 # Use word_id column from dictionary
                 word_occurrence_with_ids = word_occurrence_df.join(dictionary_df, word_occurrence_df.word == dictionary_df.word) \
                         .select("word_id", "document_id", "occurrences")
-                word_occurrence_with_ids.write.jdbc(url=url, table="word_occurrences", mode="overwrite", properties=properties)
+                word_occurrence_with_ids.write.jdbc(url=url, table="cs_word_occurrences_2", mode="overwrite", properties=properties)
