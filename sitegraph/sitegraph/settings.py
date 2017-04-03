@@ -15,7 +15,7 @@ SPIDER_MODULES = ['sitegraph.spiders']
 NEWSPIDER_MODULE = 'sitegraph.spiders'
 
 FEED_FORMAT="jsonlines"
-FEED_URI="./graphs/sitegraph.json"
+# FEED_URI="./graphs/sitegraph.json"
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
