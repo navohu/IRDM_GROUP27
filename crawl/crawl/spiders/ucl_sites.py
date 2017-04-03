@@ -1,16 +1,17 @@
 import scrapy
 import re
-from scrapy.linkextractors import LinkExtractor
+from scrapy.contrib.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider,Rule
 from scrapy.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.selector import HtmlXPathSelector
 
 class SitesSpider(CrawlSpider):
     name = "ucl-sites"
-    allowed_domains = ['www.cs.ucl.ac.uk']
-    start_urls = ['http://www.cs.ucl.ac.uk']
+    allowed_domains = ['ucl.ac.uk']
+    with open("../src/subdomains.txt", "rt") as f:
+        start_urls = [url.strip() for url in f.readlines()]
     rules = (
-        Rule(SgmlLinkExtractor(allow=('www.cs.ucl.ac.uk',)) , callback='parse_items', follow=True),
+        Rule(SgmlLinkExtractor(allow=(r'.*.ucl.ac.uk',), deny=("metalib.ucl.ac.uk"),) , callback='parse_items', follow=True),
     )
     def parse_items(self, response):
         hxs = HtmlXPathSelector(response)

@@ -10,18 +10,22 @@ class GraphspiderSpider(CrawlSpider):
     start_urls = ['http://www.cs.ucl.ac.uk']
 
     rules = (
-        Rule(SgmlLinkExtractor(allow='www.cs.ucl.ac.uk'), callback='parse_item'),
+        Rule(SgmlLinkExtractor(allow='www.cs.ucl.ac.uk'), callback='parse_item', follow=True),
     )
 
     def parse_item(self, response):
         hxs = HtmlXPathSelector(response)
-        i = SitegraphItem()
-        i['url'] = response.url
+        urlname = response.url
+        item = SitegraphItem()
+        # item['url'] = response.url
         llinks=[]
+        i = 0
         for anchor in hxs.select('//a[@href]'):
             href=anchor.select('@href').extract()[0]
 
             if not href.lower().startswith("javascript"):
                 llinks.append(urljoin_rfc(response.url,href))
-                i['linkedurls'] = llinks
-        return i
+                json = {urlname: llinks}
+                item['url'] = json
+            i = i+1
+        return item
