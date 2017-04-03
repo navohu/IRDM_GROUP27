@@ -45,7 +45,7 @@ def getWebsiteText(url):
                 print 'Skipping ', url, '- not found'
                 return ""
         except urllib2.URLError, e:
-            logging.error(ur + ': URLError = ' + str(e.reason))
+            logging.error(url + ': URLError = ' + str(e.reason))
         except httplib.HTTPException, e:
             logging.error(url + ': HTTPException')
         except Exception:

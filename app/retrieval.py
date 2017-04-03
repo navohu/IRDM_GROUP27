@@ -7,14 +7,28 @@ except:
 
 cur = conn.cursor()
 
-#while True:
-query_terms = ['ucl', 'student']
-#query_terms = raw_input("Enter a search query: ").split()
-#for term in query_terms:
-print """SELECT word, word_id FROM cs_dictionary WHERE word IN %s"""% query_terms 
+while True:
+    #query_terms = ['ucl', 'student']
+    query_terms = raw_input("Enter a search query: ").split()
 
-cur.execute("""SELECT word, word_id FROM cs_dictionary WHERE word = ANY(%s)""", (query_terms,))
-rows = cur.fetchall()
+    cur.execute("""SELECT word_id FROM cs_dictionary WHERE word = ANY(%s)""", (query_terms,))
+    rows = cur.fetchall()
 
-for row in rows:
-    print "   ", row
+    '''print "\tWord IDs"
+    for row in rows:
+        print "\t", row
+    '''
+
+    cur.execute("""SELECT document_id FROM cs_word_occurrences WHERE word_id = ANY(%s)""", (rows,))
+    docs = cur.fetchall()
+
+    '''print "\tDoc IDs"
+    for doc in docs:
+        print "\t", doc
+    '''
+
+    cur.execute("""SELECT link FROM cs_sites WHERE id = ANY(%s)""", (docs,))
+    urls = cur.fetchmany(5)
+    print "Results"
+    for url in urls:
+        print "\t", url
