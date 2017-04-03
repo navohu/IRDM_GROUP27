@@ -1,6 +1,16 @@
 # Python
 *.pyc
 
+# LaTeX
+report/*.aux
+report/*.cut
+report/*.log
+report/*.out
+report/*.pdf
+report/*.synctex.gz
+report/*.blg
+report/*.bbl
+
 # IntelliJ
 *.idea
 
