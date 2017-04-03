@@ -7,12 +7,10 @@ from scrapy.selector import HtmlXPathSelector
 
 class SitesSpider(CrawlSpider):
     name = "ucl-sites"
-    allowed_domains = ['http://www.cs.ucl.ac.uk']
-    # with open("../src/subdomains.txt", "rt") as f:
-    #     start_urls = [url.strip() for url in f.readlines()]
+    allowed_domains = ['www.cs.ucl.ac.uk']
     start_urls = ["http://www.cs.ucl.ac.uk"]
     rules = (
-        Rule(SgmlLinkExtractor(allow=('www.cs.ucl.ac.uk',),) , callback='parse_items', follow=True),
+        Rule(SgmlLinkExtractor(allow=('www.cs.ucl.ac.uk')), callback='parse_items', follow=True),
     )
     def parse_items(self, response):
         hxs = HtmlXPathSelector(response)
