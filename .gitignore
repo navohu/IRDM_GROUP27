@@ -1,3 +1,4 @@
+
 # Python
 *.pyc
 
@@ -16,3 +17,7 @@ report/*.bbl
 
 # Credentials
 spark/properties.py
+
+ENV
+
+mysite
