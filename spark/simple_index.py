@@ -1,6 +1,8 @@
 from pyspark import SparkContext
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, LongType
 from pyspark.sql.functions import monotonically_increasing_id
+import time
+import logging
 import urllib2
 import traceback
 import html2text
@@ -32,16 +34,23 @@ def splitTuple(kv_pair):
 
 def getWebsiteText(url):
     # Read from url
-    try: 
-        resp = urllib2.urlopen(url)
-    except urllib2.HTTPError, e:
-        checksLogger.error('HTTPError = ' + str(e.code))
-    except urllib2.URLError, e:
-        checksLogger.error('URLError = ' + str(e.reason))
-    except httplib.HTTPException, e:
-        checksLogger.error('HTTPException')
-    except Exception:
-        checksLogger.error('generic exception: ' + traceback.format_exc())
+    valid_response = False
+    while not valid_response:
+        try: 
+            resp = urllib2.urlopen(url)
+            valid_response = True
+        except urllib2.HTTPError, e:
+            logging.error(url + ': HTTPError = ' + str(e.code))
+            if e.code == 404:
+                print 'Skipping ', url, '- not found'
+                return ""
+        except urllib2.URLError, e:
+            logging.error(ur + ': URLError = ' + str(e.reason))
+        except httplib.HTTPException, e:
+            logging.error(url + ': HTTPException')
+        except Exception:
+            logging.error(url + ': generic exception: ' + traceback.format_exc())
+        time.sleep(1)
     html = resp.read()
 
     # Convert html to text
