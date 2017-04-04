@@ -10,16 +10,17 @@ from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 
-def addSourceID(word, nextID):
-	return (word, (nextID, 1))
+def addSourceID(word, docID):
+	return ((word, docID), 1)
 
 def flattenTuple(t):
 	'''Remove nested tuples (((d, f), (d, f)), (d,f )) -> ((d, f), (d, f), (d, f))'''
-        if type(t) == tuple and len(t) > 0 and type(t[0]) == tuple and len(t[0]) > 0 and type(t[0][0]) == tuple:
-		l = list(t[0])
-		l.append(t[1])
-		return tuple(l)
-	return t
+        while type(t) == tuple and len(t) > 0 and type(t[0]) == tuple and len(t[0]) > 0 and type(t[0][0]) == tuple:
+                l = list(t[0])
+                for elem in t[1:]:
+                        l.append(elem)
+                t = tuple(l)
+        return t
 
 def splitTuple(kv_pair):
         '''Split one key value pair (word, ((docId1, count1), (docId2, count2),...)) into one (word, docId, count) tuple per document and word'''
@@ -100,17 +101,15 @@ class InvertedIndex:
             websites_df = sqlContext.read.jdbc(url=db_url, table=table, properties=properties)
             websites_df = websites_df.select("id", "link")
 
-            websites_rdd = websites_df.rdd.map(lambda r: (r["id"], getWebsiteText(r["link"])))
-
-            websites_rdd = websites_rdd.flatMapValues(lambda text: text.split())
-            print websites_rdd.take(1)
-
-            websites_rdd = websites_rdd \
+            websites_rdd = websites_df.rdd.map(lambda r: (r["id"], getWebsiteText(r["link"]))) \
+                    .flatMapValues(lambda text: text.split()) \
                     .map(lambda kv_pair: addSourceID(kv_pair[1], kv_pair[0])) \
-                    .reduceByKey(lambda a, b: (a[0], a[1]+b[1]))
+                    .reduceByKey(lambda a, b: a+b)
 
-            self.invertedIndex = websites_rdd.reduceByKey(lambda a, b: (a,b)) \
+            self.invertedIndex = websites_rdd.map(lambda kv_pair: (kv_pair[0][0], (kv_pair[0][1], kv_pair[1]))) \
+                    .reduceByKey(lambda a, b: (a,b)) \
                     .map(lambda kv_pair: (kv_pair[0], flattenTuple(kv_pair[1])))
+            print self.invertedIndex.take(5)
 
 	def writeToDatabase(self, sqlContext, url, properties):
                 dictionary_schema = StructType(\
@@ -123,11 +122,9 @@ class InvertedIndex:
 
                 dictionary = self.invertedIndex.map(lambda kv_pair: (kv_pair[0],))
 		dictionary_df = sqlContext.createDataFrame(dictionary, dictionary_schema).withColumn("word_id", monotonically_increasing_id())
-                print 'dictionary_df take 1', dictionary_df.take(1)
                 dictionary_df.write.jdbc(url=url, table="cs_dictionary_2", mode="overwrite", properties=properties)
 
                 word_occurrence = self.invertedIndex.flatMap(splitTuple)
-                print 'word occurrence',  word_occurrence.take(1)
                 word_occurrence_df = sqlContext.createDataFrame(word_occurrence, word_occurrence_schema)
 
                 sqlContext.registerDataFrameAsTable(dictionary_df, "dict")
