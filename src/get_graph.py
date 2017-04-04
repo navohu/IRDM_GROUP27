@@ -27,16 +27,19 @@ def fetch_database_urls():
     return urls
 
 def get_urls(database):
-
+    json = {}
     for url in database:
         resp = requests.get("http://www.cs.ucl.ac.uk")
         encoding = resp.encoding if 'charset' in resp.headers.get('content-type', '').lower() else None
         soup = BeautifulSoup(resp.content, from_encoding=encoding)
 
+        
+        llinks = []
         for link in soup.find_all('a', href=True):
             if "www." in link['href']:
-                print(link['href'])
-        
+                llinks.append(link['href'])
+        json[url] = llinks
+    return json
 database_urls = fetch_database_urls()
-get_urls(database_urls)
+print get_urls(database_urls)
 
