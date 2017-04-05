@@ -4,42 +4,83 @@ import urllib2
 import sys
 import requests
 
+class MyDB():
+    def __init__(self, db='search_engine_db', usr='group27', p='',host='searchengineindex.cwbjh0hhu9l3.us-west-2.rds.amazonaws.com', port='5432'):
+        self.conn = psycopg2.connect(dbname=db, user=usr, password=p, host = host, port= port)
+        self.cur = self.conn.cursor()
+
+    def query(self, query):
+        self.cur.execute(query)
+
+    def fetchall(self):
+        self.cur.fetchall()
+
+    def commit(self):
+        self.conn.commit()
+
+    def close(self):
+        self.cur.close()
+        self.conn.close()
+
+
+
 def fetch_database_urls():
-    urls = []
-    try:
-        con = psycopg2.connect("dbname='search_engine_db' user='group27' password='irdm.group27' host='searchengineindex.cwbjh0hhu9l3.us-west-2.rds.amazonaws.com' port='5432'")   
-        cur = con.cursor()
-        query = "SELECT link FROM cs_sites"
-        cur.execute(query)
-
-        for item in list(cur.fetchall()):
-            urls.append(item[0])
-        con.commit()
-
-    except psycopg2.DatabaseError, e:
-        
-        if con:
-            con.rollback()
-        
-        print 'Error %s' % e    
-        sys.exit(1)
-
+    db = MyDB()
+    query = "SELECT link, id FROM cs_sites"
+    db.query(query)
+    for item in list(db.fetchall()):
+        urls.append(item[0])
+    db.commit()
+    db.close()
     return urls
 
-def get_urls(database):
-    json = {}
-    for url in database:
-        resp = requests.get("http://www.cs.ucl.ac.uk")
+
+def get_urls(urls):
+    db = MyDB()
+    
+    for url in urls:
+        resp = requests.get(url)
         encoding = resp.encoding if 'charset' in resp.headers.get('content-type', '').lower() else None
         soup = BeautifulSoup(resp.content, from_encoding=encoding)
 
-        
-        llinks = []
         for link in soup.find_all('a', href=True):
             if "www." in link['href']:
-                llinks.append(link['href'])
-        json[url] = llinks
-    return json
-database_urls = fetch_database_urls()
-print get_urls(database_urls)
+                # url = the source
+                # link['href'] = one outgoing link
+                query = (
+                    "IF EXISTS (SELECT * FROM cs_outgoing WHERE Link = %s)\
+                    BEGIN\
+                        WAITFOR DELAY '00:00:00'\
+                    END\
+                    ELSE\
+                    BEGIN\
+                        INSERT INTO cs_outgoing VALUES(%s)\
+                    END;\
+                    INSERT INTO cs_graph VALUES(%s, SELECT TOP 1 Id FROM cs_outgoing WHERE Link = %s)\
+                    )", (link['href'], link['href'], url.keys()[0], link['href']))
+                db.query(query)
+                db.commit()
+    db.close()
+
+# llinks.append(link['href'])
+# json[url] = llinks
+# write_url_database(url, json[url])
+# return json
+
+def main():
+    db = MyDB()
+    create_graph = "CREATE TABLE cs_graph(Id INTEGER NOT NULL AUTO_INCREMENT, Link VARCHAR(1000) PRIMARY KEY , Outgoing VARCHAR(1000))"
+    create_outgoing = "CREATE TABLE cs_outgoing(Id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT, Link VARCHAR(1000))"
+    db.query(create_graph)
+    db.query(create_outgoing)
+    db.commit()
+    db.close()
+
+    urls = fetch_database_urls()
+    get_urls(urls)
+
+
+
+if __name__ == '__main__':
+    main()
 
