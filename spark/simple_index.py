@@ -36,6 +36,8 @@ def splitTuple(kv_pair):
 def getWebsiteText(url):
     # Read from url
     valid_response = False
+    attempts = 0
+    max_attempts = 5
     while not valid_response:
         try: 
             resp = urllib2.urlopen(url)
@@ -43,7 +45,6 @@ def getWebsiteText(url):
         except urllib2.HTTPError, e:
             logging.error(url + ': HTTPError = ' + str(e.code))
             if e.code == 404:
-                print 'Skipping ', url, '- not found'
                 return ""
         except urllib2.URLError, e:
             logging.error(url + ': URLError = ' + str(e.reason))
@@ -51,6 +52,9 @@ def getWebsiteText(url):
             logging.error(url + ': HTTPException')
         except Exception:
             logging.error(url + ': generic exception: ' + traceback.format_exc())
+        attempts += 1
+        if attempts >= max_attempts:
+            return ""
         time.sleep(1)
     html = resp.read()
 
@@ -109,7 +113,6 @@ class InvertedIndex:
             self.invertedIndex = websites_rdd.map(lambda kv_pair: (kv_pair[0][0], (kv_pair[0][1], kv_pair[1]))) \
                     .reduceByKey(lambda a, b: (a,b)) \
                     .map(lambda kv_pair: (kv_pair[0], flattenTuple(kv_pair[1])))
-            print self.invertedIndex.take(5)
 
 	def writeToDatabase(self, sqlContext, url, properties):
                 dictionary_schema = StructType(\
