@@ -36,7 +36,7 @@ CONCURRENT_REQUESTS_PER_IP = 100
 COOKIES_ENABLED = False
 
 #Depth Limit of crawler
-DEPTH_LIMIT = 10
+DEPTH_LIMIT = 50
 DEPTH_STATS = True
 
 # Disable Telnet Console (enabled by default)
