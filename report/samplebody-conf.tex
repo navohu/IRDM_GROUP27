@@ -8,11 +8,7 @@ Creating an ranking results in a search engine can be done through many differen
 \subsection{TF-IDF} % (fold)
 \label{sub:tf_idf}
 
-Term Frequency (TF) and Inverse Document Frequency (IDF)  are used to examine the good and bad discriminators. 
-
-TF is the number of occurrences of a term in the document. For a document, the set of weights determined by the TF is considered as a quantitative digest of that document. In this case, the ordering of each term in the document is ignored but the number of occurrences is noted down.
-
-IDF is defined to be the total number of occurrences of a term in a collection of documents. Since TF considers all terms have equal importance when it comes to assessing the relevance of a query, this might be a problem since some terms have little or no discriminating power in determining relevance.
+Term Frequency (TF) and Inverse Document Frequency (IDF)  are used to examine the good and bad discriminators. TF is the number of occurrences of a term in the document. For a document, the set of weights determined by the TF is considered as a quantitative digest of that document. In this case, the ordering of each term in the document is ignored but the number of occurrences is noted down. IDF is defined to be the total number of occurrences of a term in a collection of documents. Since TF considers all terms have equal importance when it comes to assessing the relevance of a query, this might be a problem since some terms have little or no discriminating power in determining relevance.
 
 To produce a composite weight for each term in each document, the definitions of term frequency and inverse document frequency are combined and the weighting scheme is as:
 
@@ -27,11 +23,7 @@ where t stands for term and d stands for document. Therefore, the total relevanc
 \subsection{BM25} % (fold)
 \label{sub:bm25}
 
-BM25 improves upon TF*IDF. It stands for Best Match 25. BM Okapi 25 is designed for modern full-text search collection since it pays additional attention to the term frequency and document length.
-
-Classic IDF has the potential for giving negative scores for terms with very high document frequency. So IDF in BM25 adds 1 to the value, before taking the log, which makes it impossible to compute a negative value.
-
-Term frequency in BM25 dampens the impact of term frequency even further than traditional TF*IDF. The impact of term frequency is always increasing, but asymptotically approaches a value. In BM25, the TF score also depends on the document length. If the document length is below the average, then the TF score will get a bonus. 
+BM25 improves upon TF-IDF. It stands for Best Match 25. BM Okapi 25 is designed for modern full-text search collection since it pays additional attention to the term frequency and document length. Classic IDF has the potential for giving negative scores for terms with very high document frequency. So IDF in BM25 adds 1 to the value, before taking the log, which makes it impossible to compute a negative value. Term frequency in BM25 dampens the impact of term frequency even further than traditional TF-IDF. The impact of term frequency is always increasing, but asymptotically approaches a value. In BM25, the TF score also depends on the document length. If the document length is below the average, then the TF score will get a bonus. 
 
 The formula to adjust the TF score based on the document length is as below where b and k are constants and L is the length of document:
 \[\frac{(k + 1) * TF}{k * (1.0 - b + b * L) + TF}\]
@@ -49,6 +41,20 @@ Adding up all the changes upon the classic TF-IDF, the formula of BM25 is as fol
 
 \subsection{Evaluation} % (fold)
 \label{sub:evaluation}
+
+IR research has always had a strong emphasis on measuring the efficacy of an IR system. This includes discovering the relevance of documents, retrieved by a search engine, relative to the user's information need. Evaluation is important in order to assess the performance of the system, measure the differences of multiple systems, and to learn the faults of a system with regards to improve the works.
+
+The Text Retrieval Conference (TREC) is a conference emphasising on supporting and persuading the IR community through providing an infrastructure for evaluation IR systems. The famous infrastructure for evaluation, trec\_eval, is used for all ad hoc tasks in TREC \cite{voorhees:evaluation}. It gives you up to 85 measurements for a run which is used to evaluate an IR system. Two of the 85 measurements are precision and recall. Precision is the segment of retrieved documents that are relevant, while recall is the segment of relevant documents retrieved.
+
+$$ precision = \frac{|{relevant docs} \cap {retrieved docs}|}{|{retrieved docs}|} $$
+
+$$ recall = \frac{|{relevant docs} \cap {retrieved docs}|}{|{relevant docs}|} $$
+
+Precision and recall also tend to be inversely related since retrieving more documents often increases recall, while degrading precision and vice versa\cite{voorhees:evaluation}. This relationship can be illustrated in a precision-recall curve. From the precision-recall curve we are able to measure the area under curve, which is also referred to as mean average precision (MAP). MAP is a single valued summary measure used when the graph is too complex, e.g. two curves from two different systems are crossing and you cannot decide which one performs better \cite{voorhees:evaluation}.
+
+TREC is purely a system focused evaluation method and doesn’t consider the human using the system. Most IR evaluation systems are based on just evaluating the system, while Diane Kelly presents how you can use Interactive Information Retrieval (IIR) to also evaluate a system based on the interaction to the user \cite{kelly:evaluation}. This is an extremely hard task since all users have different information need, different query words with similar meaning (vocabulary), and expect different results for similar query words. Some might want the pandas python library when typing ‘pandas’ while others might want pictures of pandas. Some are looking for a list of literature relevant to their dissertation while others just want a single question answered. Kelly, D. presents several experimental designs and sampling strategies such as Factorial Designs, between- and within-subjects design etc. to evaluate search engines.
+
+Having a stable and robust test collection to help evaluate your IR model has been an important part of evaluation. It has created a more connected research society where researchers have shared test collections between each other. Mark Sanderson emphasises the powerfulness of good test collections used in conjunction with evaluation measures \cite{sanderson:evaluation}. One evaluation method mentioned by Sanderson is Discounted Cumulative Gain (DCG) and normalised DCG (nDCG)\cite{sanderson:evaluation}. DCG is often used to measure the ranking quality and the effectiveness of web-based search engines specifically. The algorithm measures the ‘gain’ of a document based on its position in the list. nDCG normalises the gain across queries, which is done by sorting the relevant documents by their relative relevance.
 
 % subsection evaluation (end)
 
