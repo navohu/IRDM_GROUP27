@@ -44,16 +44,17 @@ def write_to_json(feeds, obj):
 
 def get_graph(urls, feeds):
     graph = {}
-    for key, value in urls.iteritems():
-        resp = requests.get(value)
+    for key in urls:
+        resp = requests.get(key[0])
         encoding = resp.encoding if 'charset' in resp.headers.get('content-type', '').lower() else None
         soup = BeautifulSoup(resp.content, from_encoding=encoding)
-        llinks = []
-        for link in soup.find_all('a', href=True):
-            if "www." in link['href']:
-                llinks.append(link)
-        graph[key] = llinks
-        obj = {key:llinks}
+        llinks = [] 
+        for link in soup.find_all('a', href=True): 
+            if "www." in link['href']: 
+                llinks.append(link['href'])
+        graph[key[0]] = llinks
+        obj = {key[0]:llinks}
+        print obj
         write_to_json(feeds, obj)
     return graph
 
