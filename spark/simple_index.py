@@ -4,6 +4,7 @@ from pyspark.sql.functions import monotonically_increasing_id
 import time
 import logging
 import urllib2
+import httplib
 import traceback
 import html2text
 from bs4 import BeautifulSoup
@@ -110,9 +111,9 @@ class InvertedIndex:
                     .map(lambda kv_pair: addSourceID(kv_pair[1], kv_pair[0])) \
                     .reduceByKey(lambda a, b: a+b)
 
-            self.invertedIndex = websites_rdd.map(lambda kv_pair: (kv_pair[0][0], (kv_pair[0][1], kv_pair[1]))) \
-                    .reduceByKey(lambda a, b: (a,b)) \
-                    .map(lambda kv_pair: (kv_pair[0], flattenTuple(kv_pair[1])))
+            self.invertedIndex = websites_rdd.map(lambda kv_pair: (kv_pair[0][0], kv_pair[0][1], kv_pair[1])) #\
+                    #.reduceByKey(lambda a, b: (a,b)) \
+                    #.map(lambda kv_pair: (kv_pair[0], flattenTuple(kv_pair[1])))
 
 	def writeToDatabase(self, sqlContext, url, properties):
                 dictionary_schema = StructType(\
@@ -123,12 +124,12 @@ class InvertedIndex:
                         StructField("document_id", LongType(), False), \
                         StructField("occurrences", IntegerType(), True)])
 
-                dictionary = self.invertedIndex.map(lambda kv_pair: (kv_pair[0],))
+                dictionary = self.invertedIndex.map(lambda kv_pair: (kv_pair[0],)).distinct()
 		dictionary_df = sqlContext.createDataFrame(dictionary, dictionary_schema).withColumn("word_id", monotonically_increasing_id())
                 dictionary_df.write.jdbc(url=url, table="cs_dictionary_2", mode="overwrite", properties=properties)
 
-                word_occurrence = self.invertedIndex.flatMap(splitTuple)
-                word_occurrence_df = sqlContext.createDataFrame(word_occurrence, word_occurrence_schema)
+                #word_occurrence = self.invertedIndex.flatMap(splitTuple)
+                word_occurrence_df = sqlContext.createDataFrame(self.invertedIndex, word_occurrence_schema)
 
                 sqlContext.registerDataFrameAsTable(dictionary_df, "dict")
                 sqlContext.registerDataFrameAsTable(word_occurrence_df, "word_occ")
