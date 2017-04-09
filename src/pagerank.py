@@ -27,27 +27,43 @@ class MyDB():
         self.conn.close()
 
 def create_graph():
+    with open("../sitegraphs/cs_sites.json") as data_file:    
+    data = json.load(data_file)
+
     graph = {}
-    db = MyDB()
-    db.query("SELECT COUNT(*) FROM cs_sites")
-    length = db.fetchone()[0]
-    for link in range(0, length):
+    for i in range(0, len(data)):
+        key = data[i]['url'].keys()[0]
+        graph[key] = data[i]['url'].values()[0]
+    return graph
+
+# def create_graph():
+#     graph = {}
+#     db = MyDB()
+#     db.query("SELECT COUNT(*) FROM cs_sites")
+#     length = db.fetchone()[0]
+#     for link in range(0, length):
         
-        # select all the outgoing links
-        db.query("SELECT outgoing FROM cs_graph WHERE link='%s'" % link)
-        outgoing_keys = db.fetchall()
+#         # select all the outgoing links
+#         db.query("SELECT outgoing FROM cs_graph WHERE link='%s'" % link)
+#         outgoing_keys = db.fetchall()
 
-        # get the real URL value for the key link
-        db.query("SELECT cs_sites.link FROM cs_sites inner join cs_graph on cs_sites.id::varchar=link" % link)
-        key = db.fetchone()[0]
+#         # get the real URL value for the key link
+#         db.query("SELECT cs_sites.link FROM cs_sites inner join cs_graph on cs_sites.id::varchar=link" % link)
+#         key = db.fetchone()[0]
 
-        # loop through the outgoing links to get their real values
-        outgoing_values = []
-        for out in outgoing:
-            db.query("SELECT link from cs_outgoing where id='%s'" % out)
-            outgoing_values.append(db.fetchone()[0])
+#         # loop through the outgoing links to get their real values
+#         outgoing_values = []
+#         for out in outgoing:
+#             db.query("SELECT link from cs_outgoing where id='%s'" % out)
+#             outgoing_values.append(db.fetchone()[0])
 
-        graph[key] = outgoing_values #This will give you the int key and the int values, next we need to get the real link
+#         graph[key] = outgoing_values #This will give you the int key and the int values, next we need to get the real link
+
+# def get_graph():
+#     db=MyDB()
+#     db.query("SELECT * FROM json_graph")
+#     graph = db.fetchall()
+#     print graph
 
 
 # graph = {}
@@ -116,7 +132,12 @@ def pageRank(G, s = .85, maxerr = .001):
     # return normalized pagerank
     return r/sum(r)
 
-graph = create_graph()
-print graph
+
+def main():
+    graph = create_graph()
+    print graph
 # adj_matrix = getAdjacencyMatrix(graph)
 # page_rank = pageRank(adj_matrix, s=0.86)
+
+if __name__ == '__main__':
+    main()

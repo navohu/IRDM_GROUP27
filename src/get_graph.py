@@ -5,7 +5,7 @@ import sys
 import requests
 
 class MyDB():
-    def __init__(self, db='search_engine_db', usr='group27', p='irdm.group27',host='searchengineindex.cwbjh0hhu9l3.us-west-2.rds.amazonaws.com', port='5432'):
+    def __init__(self, db='search_engine_db', usr='group27', p='',host='searchengineindex.cwbjh0hhu9l3.us-west-2.rds.amazonaws.com', port='5432'):
         self.conn = psycopg2.connect(dbname=db, user=usr, password=p, host = host, port= port)
         self.cur = self.conn.cursor()
 
@@ -36,50 +36,24 @@ def fetch_database_urls():
     return urls
 
 
-def get_urls(urls):
-    db = MyDB()
+def get_graph(urls):
+    graph = {}
     for key, value in urls.iteritems():
-        print key
-        print value
         resp = requests.get(value)
         encoding = resp.encoding if 'charset' in resp.headers.get('content-type', '').lower() else None
         soup = BeautifulSoup(resp.content, from_encoding=encoding)
-
+        llinks = []
         for link in soup.find_all('a', href=True):
             if "www." in link['href']:
-                # url = the source
-                # link['href'] = one outgoing link
-                query1 = """
-                        INSERT INTO cs_outgoing(link)
-                        VALUES("%s")
-                        WHERE NOT EXISTS (SELECT * FROM cs_outgoing WHERE link = "%s")
-
-                """
-                query2 = "INSERT INTO cs_graph VALUES(%s, SELECT TOP 1 Id FROM cs_outgoing WHERE Link = %s)"
-                db.query(query1 % (link['href'], link['href']))
-                db.commit()
-                db.query(query2 % (key, link['href']))
-                db.commit()
-    db.close()
-
-# llinks.append(link['href'])
-# json[url] = llinks
-# write_url_database(url, json[url])
-# return json
+                llinks.append(link)
+        graph[key] = llinks
+    return graph
 
 def main():
-    #db = MyDB()
-    #create_graph = "CREATE TABLE cs_graph(Id serial, Link VARCHAR(1000) PRIMARY KEY , Outgoing VARCHAR(1000))"
-    #create_outgoing = "CREATE TABLE cs_outgoing(Id serial PRIMARY KEY, Link VARCHAR(1000))"
-    #db.query(create_graph)
-    #db.query(create_outgoing)
-    #db.commit()
-    #db.close()
-
     urls = fetch_database_urls()
-    get_urls(urls)
-
-
+    graph = get_graph(urls)
+    with open('./sitegraphs/cs_graph.json', 'w') as outfile:
+        json.dump(graph, outfile)
 
 if __name__ == '__main__':
     main()
