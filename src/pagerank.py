@@ -3,15 +3,15 @@ import json
 import pandas as pd
 from scipy.sparse import csc_matrix
 import numpy as np
-
-
+import psycopg2
+from psycopg2 import extras
 class MyDB():
     def __init__(self, db='search_engine_db', usr='group27', p='',host='searchengineindex.cwbjh0hhu9l3.us-west-2.rds.amazonaws.com', port='5432'):
         self.conn = psycopg2.connect(dbname=db, user=usr, password=p, host = host, port= port)
         self.cur = self.conn.cursor()
 
-    def query(self, query):
-        self.cur.execute(query)
+    def query(self, query, params=()):
+        self.cur.execute(query, params)
 
     def fetchone(self):
         return self.cur.fetchone()
@@ -51,20 +51,39 @@ def create_graph():
 #         db.query("SELECT cs_sites.link FROM cs_sites inner join cs_graph on cs_sites.id::varchar=link" % link)
 #         key = db.fetchone()[0]
 
+# <<<<<<< HEAD
+# #         # loop through the outgoing links to get their real values
+# #         outgoing_values = []
+# #         for out in outgoing:
+# #             db.query("SELECT link from cs_outgoing where id='%s'" % out)
+# #             outgoing_values.append(db.fetchone()[0])
+
+# #         graph[key] = outgoing_values #This will give you the int key and the int values, next we need to get the real link
+
+# # def get_graph():
+# #     db=MyDB()
+# #     db.query("SELECT * FROM json_graph")
+# #     graph = db.fetchall()
+# #     print graph
+
+# =======
+#         # get the real URL value for the key link
+#         db.query("SELECT cs_sites.link FROM cs_sites inner join cs_graph on cs_sites.id::varchar='%s'" % link)
+#         key = db.fetchone()[0]
+
 #         # loop through the outgoing links to get their real values
 #         outgoing_values = []
-#         for out in outgoing:
-#             db.query("SELECT link from cs_outgoing where id='%s'" % out)
-#             outgoing_values.append(db.fetchone()[0])
-
+#         for out in outgoing_keys:
+#             db.query("SELECT link from cs_outgoing where id=%s", out)
+#             outgoing_values.append(db.fetchall())
+        
 #         graph[key] = outgoing_values #This will give you the int key and the int values, next we need to get the real link
-
-# def get_graph():
-#     db=MyDB()
-#     db.query("SELECT * FROM json_graph")
-#     graph = db.fetchall()
-#     print graph
-
+#         obj = {key : outgoing_values}
+#         print obj
+#         #db.query("INSERT INTO json_graph VALUES(%s)", [extras.Json(obj)])
+#         #db.commit()
+#     return graph
+# >>>>>>> 5ead35c0d8a2778c067c7a6f6fae175de1a14c52
 
 # graph = {}
 # for i in range(0, len(data)):
@@ -132,6 +151,7 @@ def pageRank(G, s = .85, maxerr = .001):
     # return normalized pagerank
     return r/sum(r)
 
+<<<<<<< HEAD
 
 def main():
     graph = create_graph()
@@ -141,3 +161,9 @@ def main():
 
 if __name__ == '__main__':
     main()
+=======
+graph = create_graph()
+#print graph
+# adj_matrix = getAdjacencyMatrix(graph)
+# page_rank = pageRank(adj_matrix, s=0.86)
+>>>>>>> 5ead35c0d8a2778c067c7a6f6fae175de1a14c52
