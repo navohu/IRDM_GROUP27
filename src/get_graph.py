@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import urllib2
 import sys
 import requests
+from db import MyDB
 
 class MyDB():
     def __init__(self, db='search_engine_db', usr='group27', p='',host='searchengineindex.cwbjh0hhu9l3.us-west-2.rds.amazonaws.com', port='5432'):
@@ -35,8 +36,13 @@ def fetch_database_urls():
     db.close()
     return urls
 
+def write_to_json(feeds, obj):
+    with open('graph.json', mode='w', encoding='utf-8') as feedsjson:
+        feeds.append(obj)
+        json.dump(feeds, feedsjson)
 
-def get_graph(urls):
+
+def get_graph(urls, feeds):
     graph = {}
     for key, value in urls.iteritems():
         resp = requests.get(value)
@@ -47,13 +53,16 @@ def get_graph(urls):
             if "www." in link['href']:
                 llinks.append(link)
         graph[key] = llinks
+        obj = {key:llinks}
+        write_to_json(feeds, obj)
     return graph
 
 def main():
+    with open('graph.json', mode='r', encoding='utf-8') as feedsjson:
+        feeds = json.load(feedsjson)
+
     urls = fetch_database_urls()
-    graph = get_graph(urls)
-    with open('./sitegraphs/cs_graph.json', 'w') as outfile:
-        json.dump(graph, outfile)
+    graph = get_graph(urls, feeds)
 
 if __name__ == '__main__':
     main()
