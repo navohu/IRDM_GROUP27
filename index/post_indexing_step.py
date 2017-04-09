@@ -19,7 +19,7 @@ class PostIndexing():
         self.conn.commit()
 
     def add_doc_lengths(self, col_name):
-        self.query("""ALTER TABLE %(sites)s ADD COLUMN %(col)s INTEGER""",
+        self.query("""ALTER TABLE %(sites)s ADD COLUMN %(col)s BIGINT""",
                    params={"sites": AsIs(self.sites), "col": AsIs(col_name)})
 
         self.query("""CREATE TABLE temp_lengths AS (SELECT sum(occurrences), document_id FROM %(occs)s GROUP BY document_id)""",
@@ -31,7 +31,7 @@ class PostIndexing():
         self.query("DROP TABLE temp_lengths")
 
     def add_word_freqs(self, col_name):
-        self.query("""ALTER TABLE %(dict)s ADD COLUMN %(col)s INTEGER""",
+        self.query("""ALTER TABLE %(dict)s ADD COLUMN %(col)s BIGINT""",
                    params={"dict": AsIs(self.dict), "col": AsIs(col_name)})
 
         self.query("""CREATE TABLE temp_freqs AS (SELECT sum(occurrences), word_id FROM %(occs)s GROUP BY word_id)""",
