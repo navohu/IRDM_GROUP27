@@ -11,7 +11,11 @@ def create_graph():
     graph = {}
     for obj in data:
         key = obj.keys()[0]
-        values = obj.values()
+        values = obj.values()[0]
+        values = []
+        for value in obj.values()[0]:
+            if "cs.ucl.ac.uk" in value:
+                values.append(value)
         graph[key] = values
     return graph
 
@@ -77,7 +81,7 @@ def pageRank(G, s = .85, maxerr = .001):
     return r/sum(r)
 
 def main():
-    graph = create_graph()
+    # graph = create_graph()
     print graph
 # adj_matrix = getAdjacencyMatrix(graph)
 # page_rank = pageRank(adj_matrix, s=0.86)
