@@ -1,0 +1,246 @@
+\section{Introduction}
+
+TODO:
+
+\section{Related Work}
+Creating an ranking results in a search engine can be done through many different algorithms. This literature review will go through two type of algorithms used for ranking the documents based on the query: non-probabilistic and probabilistic. Then we will explore how to evaluate the results, based on a test set. Deep Learning is also a new topic that has caught attention, and will therefore be reviewed in terms of how it can be used in search engines.
+
+\subsection{TF-IDF} % (fold)
+\label{sub:tf_idf}
+
+Term Frequency (TF) and Inverse Document Frequency (IDF)  are used to examine the good and bad discriminators. TF is the number of occurrences of a term in the document. For a document, the set of weights determined by the TF is considered as a quantitative digest of that document. In this case, the ordering of each term in the document is ignored but the number of occurrences is noted down. IDF is defined to be the total number of occurrences of a term in a collection of documents. Since TF considers all terms have equal importance when it comes to assessing the relevance of a query, this might be a problem since some terms have little or no discriminating power in determining relevance.
+
+To produce a composite weight for each term in each document, the definitions of term frequency and inverse document frequency are combined and the weighting scheme is as:
+
+\[tf\cdot idf_{t,d}=tf_{t,d}\times idf_{t}\]
+
+where t stands for term and d stands for document. Therefore, the total relevance score of a document would be:
+
+\[score(q,d)=\sum_{t\in q}^{} tf\cdot idf_{t,d}\]
+
+% subsection tf_idf (end)
+
+\subsection{BM25} % (fold)
+\label{sub:bm25}
+
+BM25 improves upon TF-IDF. It stands for Best Match 25. BM Okapi 25 is designed for modern full-text search collection since it pays additional attention to the term frequency and document length. Classic IDF has the potential for giving negative scores for terms with very high document frequency. So IDF in BM25 adds 1 to the value, before taking the log, which makes it impossible to compute a negative value. Term frequency in BM25 dampens the impact of term frequency even further than traditional TF-IDF. The impact of term frequency is always increasing, but asymptotically approaches a value. In BM25, the TF score also depends on the document length. If the document length is below the average, then the TF score will get a bonus. 
+
+The formula to adjust the TF score based on the document length is as below where b and k are constants and L is the length of document:
+\[\frac{(k + 1) * TF}{k * (1.0 - b + b * L) + TF}\]
+
+Adding up all the changes upon the classic TF-IDF, the formula of BM25 is as follow:
+\[score(q,d)=IDF * \frac{(k + 1) * TF}{k * (1.0 - b + b * \frac{|d|}{avgDl}) + TF}
+\]
+
+% subsection bm25 (end)
+
+\subsection{Probabilistic Algorithms} % (fold)
+\label{sub:probabilistic_algorithms}
+
+% subsection probabilistic_algorithms (end)
+
+\subsection{Evaluation} % (fold)
+\label{sub:evaluation}
+
+IR research has always had a strong emphasis on measuring the efficacy of an IR system. This includes discovering the relevance of documents, retrieved by a search engine, relative to the user's information need. Evaluation is important in order to assess the performance of the system, measure the differences of multiple systems, and to learn the faults of a system with regards to improve the works.
+
+The Text Retrieval Conference (TREC) is a conference emphasising on supporting and persuading the IR community through providing an infrastructure for evaluation IR systems. The famous infrastructure for evaluation, trec\_eval, is used for all ad hoc tasks in TREC \cite{voorhees:evaluation}. It gives you up to 85 measurements for a run which is used to evaluate an IR system. Two of the 85 measurements are precision and recall. Precision is the segment of retrieved documents that are relevant, while recall is the segment of relevant documents retrieved.
+
+$$ precision = \frac{|{relevant docs} \cap {retrieved docs}|}{|{retrieved docs}|} $$
+
+$$ recall = \frac{|{relevant docs} \cap {retrieved docs}|}{|{relevant docs}|} $$
+
+Precision and recall also tend to be inversely related since retrieving more documents often increases recall, while degrading precision and vice versa\cite{voorhees:evaluation}. This relationship can be illustrated in a precision-recall curve. From the precision-recall curve we are able to measure the area under curve, which is also referred to as mean average precision (MAP). MAP is a single valued summary measure used when the graph is too complex, e.g. two curves from two different systems are crossing and you cannot decide which one performs better \cite{voorhees:evaluation}.
+
+TREC is purely a system focused evaluation method and doesn’t consider the human using the system. Most IR evaluation systems are based on just evaluating the system, while Diane Kelly presents how you can use Interactive Information Retrieval (IIR) to also evaluate a system based on the interaction to the user \cite{kelly:evaluation}. This is an extremely hard task since all users have different information need, different query words with similar meaning (vocabulary), and expect different results for similar query words. Some might want the pandas python library when typing ‘pandas’ while others might want pictures of pandas. Some are looking for a list of literature relevant to their dissertation while others just want a single question answered. Kelly, D. presents several experimental designs and sampling strategies such as Factorial Designs, between- and within-subjects design etc. to evaluate search engines.
+
+Having a stable and robust test collection to help evaluate your IR model has been an important part of evaluation. It has created a more connected research society where researchers have shared test collections between each other. Mark Sanderson emphasises the powerfulness of good test collections used in conjunction with evaluation measures \cite{sanderson:evaluation}. One evaluation method mentioned by Sanderson is Discounted Cumulative Gain (DCG) and normalised DCG (nDCG)\cite{sanderson:evaluation}. DCG is often used to measure the ranking quality and the effectiveness of web-based search engines specifically. The algorithm measures the ‘gain’ of a document based on its position in the list. nDCG normalises the gain across queries, which is done by sorting the relevant documents by their relative relevance.
+
+% subsection evaluation (end)
+
+\subsection{Deep Learning} % (fold)
+\label{sub:deep_learning}
+
+% subsection deep_learning (end)
+
+\section{Experiment} % (fold)
+\label{sec:experiment}
+
+\subsection{Dataset Description} % (fold)
+\label{sub:dataset_description}
+
+The search engine is dealing with two core datasets: the crawled web pages and the test set for evaluation. The crawled web pages are specifically modified and transformed for use. One example of this is creating an inverted index based on the content of the crawled web pages. Another example is how to create an adjacency matrix based on the relationship between pages.
+
+The test set was manually created in order for us to evaluate the performance of our search engine. Two main test sets were created: one for precision, and one for recall. That means that one test set is specifically created such that the user want \emph{one} specific document (precision), while the other test set is created to retrieve as many relevant documents as possible (recall). Both test sets needed queries and relevant documents related to the queries. There are also three different types of queries: informational, transactional and navigational queries. The two test sets therefore includes all three types of queries.
+
+% subsection dataset_description (end)
+
+\subsection{Methods} % (fold)
+\label{sub:methods}
+The methodology includes a wide range of steps and exploration in order to build our search engine. These will be presented here.
+
+\subsubsection{AWS Database \& Server Setup} % (fold)
+\label{ssub:database_and_server_setup}
+
+% subsubsection database_and_server_setup (end)
+
+\subsubsection{Crawling} % (fold)
+\label{ssub:crawling}
+
+The crawling was done through an open source platform called Scrapy\footnote{https://scrapy.org} written in Python. This platform would be given a start-url "\url{www.cs.ucl.ac.uk}", followed by a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. So "\url{www.cs.ucl.ac.uk/home}" would be accepted, just like "\url{www.wiki.cs.ucl.ac.uk}". We set a max-depth of the crawler because we realised throughout the crawling that some links were extremely long with unnecessary indexing information of the CS website.
+
+The elements that were crawled from the website was the urls, titles ($<$h1$>$ tags) of page and the anchor text. Each instance would also be associated with a unique identifier. Let's call this table \emph{cs\_sites}. The reason why we didn't crawl the content of the pages to store in the database was because of storage reasons. As long as we have all the links of the whole domain in the database it is easy to access the content of the page at a later point.
+
+% subsubsection crawling (end)
+
+\subsubsection{Inverted Index} % (fold)
+\label{ssub:inverted_index}
+
+% subsubsection inverted_index (end)
+
+\subsubsection{PageRank} % (fold)
+\label{ssub:pagerank}
+
+The popular algorithm PageRank\footnote{https://en.wikipedia.org/wiki/PageRank} is an algorithm developed by Google for ranking the results within a search engine. It is also commonly used for measuring the importance of a website. The algorithm is based on an assumption that more important websites are more likely to be pointed to from other websites.
+
+The algorithm implies that it would need a way of representing connections between web sites. This can easily be done with the aid of an adjacency matrix. Firstly, all the connections needed to be measured, which was done by obtaining all the outgoing links for each site in \emph{cs\_sites}. Now, each link would point to a certain number of outgoing links disregarding whether they were in \emph{cs.ucl.ac.uk} domain or not. From these connection a adjacency matrix as shown as an example in Table \ref{fig:adj_mx}. 
+
+\begin{table}[!h]
+  \centering
+  \begin{tabular}{|lr|c|c|c|} \cline{3-5}
+  \multicolumn{1}{l}{} && \multicolumn{3}{c|}{To} \\ \cline{3-5}
+  \multicolumn{1}{l}{} & & A & B & C  \\ \hline
+  \multirow{3}{*}{\begin{sideways}From\end{sideways}}
+  %                           A   B   C   
+  & \multicolumn{1}{|r|}{A} & 0 & 0 & 1  \\ \cline{2-5}
+  & \multicolumn{1}{|r|}{B} & 0 & 1 & 1  \\ \cline{2-5}
+  & \multicolumn{1}{|r|}{C} & 1 & 1 & 0  \\ \hline
+  \end{tabular}
+  \caption{Adjacency matrix between links, where A, B and C represents links. The number 1 represents a connection, while 0 represents no connection.}
+  \label{fig:adj_mx}
+\end{table}
+
+The adjacency matrix was then used in the PageRank algorithm to compute the rank of each link. The implementation would first convert the adjacency matrix into a markov matrix, followed by computing the rank of state \emph{i}:
+
+$$ r_i = r_{i-1} \cdot (I_i *s + S_i * s + T_i * (1-s)) $$ 
+
+where \emph{r} is the PageRank, \emph{$I_i$} is the inlinks of state \emph{i}, \emph{$S_i$} are the sink states, \emph{$T_i$} is the teleporting state and \emph{s} is the probabillity of following a transitions. That means that \emph{s-1} is the probability of teleporting. We have set $s=.85$. The algorithm will continue to calculate \emph{$r_i$} until it reaches a value below the maxerr rate ($maxerr = 0.001$). It is then said to be converged.
+
+% $$ PR(u)= \sum\limits_{v \in B_u} \frac{PR(v)}{L(v)}$$
+
+
+% subsubsection pagerank (end)
+
+\subsubsection{Boolean Retrieval} % (fold)
+\label{ssub:boolean_retrieval}
+
+% subsubsection boolean_retrieval (end)
+
+\subsubsection{BM25} % (fold)
+\label{ssub:BM25}
+
+% subsubsection BM25 (end)
+
+\subsubsection{Query Likelihood with Smoothing} % (fold)
+\label{ssub:query_likelihood_with_smoothing}
+
+% subsubsection query_likelihood_with_smoothing (end)
+
+
+% subsection methods (end)
+
+\subsection{Metrics \& Analysis} % (fold)
+\label{sub:metrics_&_analysis}
+
+% subsection metrics_&_analysis (end)
+
+\subsection{Analysis of Results} % (fold)
+\label{sub:analysis_of_results}
+
+% subsection analysis_of_results (end)
+
+% section experiment (end)
+
+\section{Discussion \& Limitations} % (fold)
+\label{sec:discussion_&_limitations}
+
+% section discussion_&_limitations (end)
+
+\section{Conclusion} % (fold)
+\label{sec:conclusion}
+
+% section conclusion (end)
+
+\section{References} % (fold)
+\label{sec:references}
+
+% section references (end)
+
+
+% \begin{equation}
+%   \lim_{n\rightarrow \infty}x=0
+% \end{equation}
+% Notice how it is formatted somewhat differently in
+% the \textbf{displaymath}
+% environment.  Now, we'll enter an unnumbered equation:
+% \begin{displaymath}
+%   \sum_{i=0}^{\infty} x + 1
+% \end{displaymath}
+% and follow it with another numbered equation:
+% \begin{equation}
+%   \sum_{i=0}^{\infty}x_i=\int_{0}^{\pi+2} f
+% \end{equation}
+% just to demonstrate \LaTeX's able handling of numbering.
+
+
+% \begin{table}
+%   \caption{Frequency of Special Characters}
+%   \label{tab:freq}
+%   \begin{tabular}{ccl}
+%     \toprule
+%     Non-English or Math&Frequency&Comments\\
+%     \midrule
+%     \O & 1 in 1,000& For Swedish names\\
+%     $\pi$ & 1 in 5& Common in math\\
+%     \$ & 4 in 5 & Used in business\\
+%     $\Psi^2_1$ & 1 in 40,000& Unexplained usage\\
+%   \bottomrule
+% \end{tabular}
+% \end{table}
+
+
+% \begin{table*}
+%   \caption{Some Typical Commands}
+%   \label{tab:commands}
+%   \begin{tabular}{ccl}
+%     \toprule
+%     Command &A Number & Comments\\
+%     \midrule
+%     \texttt{{\char'134}author} & 100& Author \\
+%     \texttt{{\char'134}table}& 300 & For tables\\
+%     \texttt{{\char'134}table*}& 400& For wider tables\\
+%     \bottomrule
+%   \end{tabular}
+% \end{table*}
+% % end the environment with {table*}, NOTE not {table}!
+
+% Lists:
+% \begin{enumerate}
+% \item Never, ever use vertical rules.
+% \item Never use double rules.
+% \end{enumerate}
+% It is also a good idea not to overuse horizontal rules.
+
+% Figures
+%\begin{figure}
+%\includegraphics{fly}
+%\caption{A sample black and white graphic.}
+%\end{figure}
+%
+%\begin{figure}
+%\includegraphics[height=1in, width=1in]{fly}
+%\caption{A sample black and white graphic
+%that has been resized with the \texttt{includegraphics} command.}
+%\end{figure}
+
+
