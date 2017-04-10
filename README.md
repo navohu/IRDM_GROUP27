@@ -1,5 +1,5 @@
 # Search Engine for the UCL Website
-##### COMPM052 Information Retireval and Data Mining
+##### UCL Computer Science - COMPM052 Information Retrieval and Data Mining
 ###### GROUP27
 
 ### How to run
