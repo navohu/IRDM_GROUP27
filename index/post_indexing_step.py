@@ -6,8 +6,8 @@ class PostIndexing():
         self.conn = psycopg2.connect(dbname=db, user=usr, host=host, port=port)
         self.cur = self.conn.cursor()
         self.sites = "cs_sites"
-        self.dict = "cs_dictionary"
-        self.occs = "cs_word_occurrences"
+        self.dict = "cs_dictionary_raw"
+        self.occs = "cs_word_occurrences_raw"
 
     def close(self):
         self.cur.close()
@@ -45,7 +45,7 @@ class PostIndexing():
 
 if __name__ == "__main__":
     post_indexing = PostIndexing()
-    post_indexing.add_doc_lengths("stemmed_length")
+    post_indexing.add_doc_lengths("raw_length")
     post_indexing.add_word_freqs("freq")
     post_indexing.close()
 
