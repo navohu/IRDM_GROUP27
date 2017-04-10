@@ -3,6 +3,7 @@ import json
 import pandas as pd
 from scipy.sparse import csc_matrix
 import numpy as np
+import os
 
 def create_graph():
     with open("graph.json") as data_file:    
@@ -28,6 +29,29 @@ def getAdjacencyMatrix(g):
     df = pd.DataFrame(edges)
 
     adj_matrix = pd.crosstab(df[0], df[1])
+    col_names = [str(col) for col in adj_matrix]
+    pages = list(adj_matrix) + list(adj_matrix.index)
+    # Remove duplicates
+    pages = list(set(pages))
+    pages.sort()
+    print 'Shape before padding:', adj_matrix.shape 
+
+    for p in range(len(pages)):
+        if p % 200 == 0:
+            print 'Checking page', p, '/', len(pages)
+        page = pages[p]
+        if page not in adj_matrix.index:
+            #print page, 'missing from rows'
+            adj_matrix.loc[page] = np.zeros(len(list(adj_matrix)), dtype=np.uint8)
+
+        if page not in adj_matrix:
+            #print page, 'missing from cols'
+            adj_matrix.insert(p, page, np.zeros(len(adj_matrix), dtype=np.int8))
+    
+    adj_matrix = adj_matrix.sort_index(axis=0)
+    adj_matrix = adj_matrix.sort_index(axis=1)
+    print 'Shape after padding:', adj_matrix.shape 
+    print adj_matrix.head(3)
     return adj_matrix
 
 def pageRank(G, s = .85, maxerr = .001):
@@ -53,7 +77,7 @@ def pageRank(G, s = .85, maxerr = .001):
     n = G.shape[0]
 
     # transform G into markov matrix M
-    M = csc_matrix(G,dtype=np.float)
+    M = csc_matrix(G, dtype=np.float)
     rsums = np.array(M.sum(1))[:,0]
     ri, ci = M.nonzero()
     M.data /= rsums[ri]
@@ -81,10 +105,15 @@ def pageRank(G, s = .85, maxerr = .001):
     return r/sum(r)
 
 def main():
-    # graph = create_graph()
-    print graph
-# adj_matrix = getAdjacencyMatrix(graph)
-# page_rank = pageRank(adj_matrix, s=0.86)
+    graph = create_graph()
+    matrix_filename = 'adj_matrix.csv'
+    if os.path.isfile(matrix_filename):
+        adj_matrix = pd.read_csv(matrix_filename, index_col=0)
+    else:
+        adj_matrix = getAdjacencyMatrix(graph)
+        adj_matrix.to_csv(matrix_filename)
+
+    page_rank = pageRank(adj_matrix, s=0.85)
 
 if __name__ == '__main__':
     main()
