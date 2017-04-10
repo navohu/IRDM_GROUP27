@@ -5,8 +5,10 @@ from scipy.sparse import csc_matrix
 import numpy as np
 import os
 
+from index.post_indexing_step import PostIndexing
+
 def create_graph():
-    with open("graph.json") as data_file:    
+    with open("index/pagerank/graph.json") as data_file:    
         data = json.load(data_file)
 
     graph = {}
@@ -84,6 +86,9 @@ def pageRank(G, s = .85, maxerr = .001):
 
     # bool array of sink states
     sink = rsums==0
+    # bool array of non-sink states
+    non_sink = rsums!=0
+    print sink
 
     # Compute pagerank r until we converge
     ro, r = np.zeros(n), np.ones(n)
@@ -91,29 +96,43 @@ def pageRank(G, s = .85, maxerr = .001):
         print "Convergence: " + str(np.sum(np.abs(r-ro)))
         ro = r.copy()
         # calculate each pagerank at a time
-        for i in xrange(0,n):
-            # inlinks of state i
-            Ii = np.array(M[:,i].todense())[:,0]
-            # account for sink states
-            Si = sink / float(n)
-            # account for teleportation to state i
-            Ti = np.ones(n) / float(n)
+        for i in xrange(0, n):
+            # transition probabilities from incoming links
+            incoming_links = np.array(M[:,i].todense())[:,0]
+            #print 'page', i, 'has', sum(incoming_links), 'incoming links'
+            # teleporting from sink states - do these get counted twice?
+            sink_links = sink / float(n)
+            #print 'page', i, 'has', sum(sink_links), 'sink links'
+            # teleporting from elsewhere
+            teleportation_links = non_sink / float(n)
+            #print 'page', i, 'has', sum(teleportation_links), 'teleportation links'
 
-            r[i] = ro.dot( Ii*s + Si*s + Ti*(1-s) )
+            r[i] = ro.dot( incoming_links*s + sink_links*s + teleportation_links*(1-s) )
 
     # return normalized pagerank
     return r/sum(r)
 
 def main():
     graph = create_graph()
-    matrix_filename = 'adj_matrix.csv'
+    matrix_filename = 'index/pagerank/adj_matrix.csv'
     if os.path.isfile(matrix_filename):
         adj_matrix = pd.read_csv(matrix_filename, index_col=0)
     else:
         adj_matrix = getAdjacencyMatrix(graph)
         adj_matrix.to_csv(matrix_filename)
 
-    page_rank = pageRank(adj_matrix, s=0.85)
+
+
+    '''adj_matrix_contents = adj_matrix.ix[1:]
+                adj_matrix_contents.drop(adj_matrix.columns[[0]], axis=1, inplace=True)
+                print adj_matrix.head(2)
+                print adj_matrix_contents.head(2)'''
+    #page_rank = pageRank(adj_matrix, s=0.80)
+    pagerank = np.ones(adj_matrix.shape[0])
+    pagerank /= adj_matrix.shape[0]
+    PostIndexing().add_pageranks(zip(adj_matrix.index, pagerank))
+
+    print pagerank
 
 if __name__ == '__main__':
     main()

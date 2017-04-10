@@ -13,10 +13,12 @@ class PostIndexing():
         self.cur.close()
         self.conn.close()
 
-    def query(self, query, params=()):
+    def query(self, query, params=(), print_query=True, commit=True):
         self.cur.execute(query, params)
-        print self.cur.query
-        self.conn.commit()
+        if print_query:
+            print self.cur.query
+        if commit:
+            self.conn.commit()
 
     def add_doc_lengths(self, col_name):
         self.query("""ALTER TABLE %(sites)s ADD COLUMN %(col)s BIGINT""",
@@ -41,6 +43,23 @@ class PostIndexing():
                    params={"dict": AsIs(self.dict), "col": AsIs(col_name)})
 
         self.query("DROP TABLE temp_freqs")
+
+    def add_pageranks(self, pageranks):
+        self.query("""ALTER TABLE %(sites)s ADD COLUMN pagerank NUMERIC""",
+                   params={"sites": AsIs(self.sites)})
+        pageranks = map(lambda row: {"url": row[0], "rank": row[1]}, pageranks)
+        print pageranks[:3]
+        #for pr in range(len(pageranks)):
+        #    if pr % 1000 == 0:
+        #        print "Writing pagerank"
+        #    pagerank = {"url": pageranks[pr][0], "rank": pageranks[pr][1]}
+        #    self.query("""UPDATE %(sites)s SET pagerank = %(rank)s WHERE link = %(url)s""",
+        #               params={"sites": AsIs(self.sites), "url": pagerank[0], "rank": pagerank[1]},
+        #               print_query=False,
+        #               commit=False)
+        self.cur.executemany("""UPDATE {0} SET pagerank = %(rank)s WHERE link = %(url)s""".format(self.sites),
+                            pageranks)
+        self.conn.commit()
 
 
 if __name__ == "__main__":
