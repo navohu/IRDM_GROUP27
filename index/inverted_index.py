@@ -34,7 +34,7 @@ def splitTuple(kv_pair):
         return tuple_list
 
 
-def getWebsiteText(url):
+def getWebsiteText(url, preprocess):
     # Read from url
     valid_response = False
     attempts = 0
@@ -64,17 +64,19 @@ def getWebsiteText(url):
     [s.extract() for s in soup('script')]
     [s.extract() for s in soup('style')]
     text = soup.get_text(' ')
+    words = text.lower().split()
+    if preprocess:
+        # Stopping
+        stop = set(stopwords.words('english'))
+        stopped_text = [i for i in words if i not in stop]
 
-    # Stopping
-    stop = set(stopwords.words('english'))
-    stopped_text = [i for i in text.lower().split() if i not in stop]
-
-    # Stemming
-    porter_stemmer = PorterStemmer()
-    stemmed_text = [porter_stemmer.stem(i) for i in stopped_text]
+        # Stemming
+        porter_stemmer = PorterStemmer()
+        stemmed_text = [porter_stemmer.stem(i) for i in stopped_text]
+        words = stemmed_text 
     
     final_string = ""
-    for word in stemmed_text:
+    for word in words:
         word = word.replace(u'\00', '')
         # Split hyphenated words
         for w in word.split('-'):
@@ -86,8 +88,9 @@ def getWebsiteText(url):
 
 
 class InvertedIndex:
-	def __init__(self, sc):
+	def __init__(self, sc, preprocessWords):
 		self.invertedIndex = sc.emptyRDD()
+                self.preprocessWords = preprocessWords
 
 	def addDocument(self, websiteText, nextID):
 		# Count words in current document and map them to document ID
@@ -105,9 +108,14 @@ class InvertedIndex:
         def indexTable(self, sqlContext, db_url, table, properties):
             websites_df = sqlContext.read.jdbc(url=db_url, table=table, properties=properties)
             websites_df = websites_df.select("id", "link")
+            websites_rdd = websites_df.rdd
 
-            websites_rdd = websites_df.rdd.map(lambda r: (r["id"], getWebsiteText(r["link"]))) \
-                    .flatMapValues(lambda text: text.split()) \
+            if self.preprocessWords:
+                    websites_rdd = websites_rdd.map(lambda r: (r["id"], getWebsiteText(r["link"], True)))
+            else:
+                    websites_rdd = websites_rdd.map(lambda r: (r["id"], getWebsiteText(r["link"], False)))
+            
+            websites_rdd = websites_rdd.flatMapValues(lambda text: text.split()) \
                     .map(lambda kv_pair: addSourceID(kv_pair[1], kv_pair[0])) \
                     .reduceByKey(lambda a, b: a+b)
 
@@ -126,7 +134,7 @@ class InvertedIndex:
 
                 dictionary = self.invertedIndex.map(lambda kv_pair: (kv_pair[0],)).distinct()
 		dictionary_df = sqlContext.createDataFrame(dictionary, dictionary_schema).withColumn("word_id", monotonically_increasing_id())
-                dictionary_df.write.jdbc(url=url, table="cs_dictionary_2", mode="overwrite", properties=properties)
+                dictionary_df.write.jdbc(url=url, table="cs_dictionary_raw", mode="overwrite", properties=properties)
 
                 #word_occurrence = self.invertedIndex.flatMap(splitTuple)
                 word_occurrence_df = sqlContext.createDataFrame(self.invertedIndex, word_occurrence_schema)
@@ -137,4 +145,4 @@ class InvertedIndex:
                 # Use word_id column from dictionary
                 word_occurrence_with_ids = word_occurrence_df.join(dictionary_df, word_occurrence_df.word == dictionary_df.word) \
                         .select("word_id", "document_id", "occurrences")
-                word_occurrence_with_ids.write.jdbc(url=url, table="cs_word_occurrences_2", mode="overwrite", properties=properties)
+                word_occurrence_with_ids.write.jdbc(url=url, table="cs_word_occurrences_raw", mode="overwrite", properties=properties)

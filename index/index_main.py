@@ -9,7 +9,7 @@ sys.setdefaultencoding('utf8')
 
 sc = SparkContext()
 sqlContext = SQLContext(sc)
-index = InvertedIndex(sc)
+index = InvertedIndex(sc, preprocessWords=False)
 
 index.indexTable(sqlContext, db_url, "cs_sites", properties)
 
