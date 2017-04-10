@@ -100,7 +100,7 @@ def pageRank(G, s = .85, maxerr = .001):
             # transition probabilities from incoming links
             incoming_links = np.array(M[:,i].todense())[:,0]
             #print 'page', i, 'has', sum(incoming_links), 'incoming links'
-            # teleporting from sink states - do these get counted twice?
+            # teleporting from sink states
             sink_links = sink / float(n)
             #print 'page', i, 'has', sum(sink_links), 'sink links'
             # teleporting from elsewhere
@@ -120,19 +120,12 @@ def main():
     else:
         adj_matrix = getAdjacencyMatrix(graph)
         adj_matrix.to_csv(matrix_filename)
+    
+    pagerank = pageRank(adj_matrix, s=0.80)
+    pageranks = zip(adj_matrix.index, pagerank)
+    PostIndexing().add_pageranks(pageranks)
 
-
-
-    '''adj_matrix_contents = adj_matrix.ix[1:]
-                adj_matrix_contents.drop(adj_matrix.columns[[0]], axis=1, inplace=True)
-                print adj_matrix.head(2)
-                print adj_matrix_contents.head(2)'''
-    #page_rank = pageRank(adj_matrix, s=0.80)
-    pagerank = np.ones(adj_matrix.shape[0])
-    pagerank /= adj_matrix.shape[0]
-    PostIndexing().add_pageranks(zip(adj_matrix.index, pagerank))
-
-    print pagerank
+    print pageranks[:10]
 
 if __name__ == '__main__':
     main()
