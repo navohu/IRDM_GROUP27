@@ -1,3 +1,4 @@
+import csv
 import psycopg2
 from psycopg2.extensions import AsIs
 
@@ -45,21 +46,19 @@ class PostIndexing():
         self.query("DROP TABLE temp_freqs")
 
     def add_pageranks(self, pageranks):
+        with open("pageranks.csv", "wb") as f:
+            writer = csv.writer(f)
+            writer.writerows(pageranks)
+
+        self.query("""CREATE TABLE temp_pageranks(link VARCHAR, rank NUMERIC)""")
+        with open("pageranks.csv", "r") as f:
+            self.cur.copy_from(f, 'temp_pageranks', sep=",")
+        
         self.query("""ALTER TABLE %(sites)s ADD COLUMN pagerank NUMERIC""",
                    params={"sites": AsIs(self.sites)})
-        pageranks = map(lambda row: {"url": row[0], "rank": row[1]}, pageranks)
-        print pageranks[:3]
-        #for pr in range(len(pageranks)):
-        #    if pr % 1000 == 0:
-        #        print "Writing pagerank"
-        #    pagerank = {"url": pageranks[pr][0], "rank": pageranks[pr][1]}
-        #    self.query("""UPDATE %(sites)s SET pagerank = %(rank)s WHERE link = %(url)s""",
-        #               params={"sites": AsIs(self.sites), "url": pagerank[0], "rank": pagerank[1]},
-        #               print_query=False,
-        #               commit=False)
-        self.cur.executemany("""UPDATE {0} SET pagerank = %(rank)s WHERE link = %(url)s""".format(self.sites),
-                            pageranks)
-        self.conn.commit()
+        self.query("""UPDATE %(sites)s SET pagerank = rank FROM temp_pageranks WHERE %(sites)s.link = temp_pageranks.link""",
+                   params={"sites": AsIs(self.sites)})
+        self.query("""DROP TABLE temp_pageranks""")
 
 
 if __name__ == "__main__":
