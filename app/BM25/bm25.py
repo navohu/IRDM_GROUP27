@@ -12,15 +12,13 @@ class BM25Ranking(Ranking):
         k2 = 100
         b = 0.75
         R = 0.0
-        K = self.compute_K(dl, avdl)
+        K = self.compute_K(dl, avdl, k1, b)
         first = log( ( (r + 0.5) / (R - r + 0.5) ) / ( (n - r + 0.5) / (N - n - R + r + 0.5)) )
         second = ((k1 + 1) * f) / (K + f)
         third = ((k2+1) * qf) / (k2 + qf)
         return first * second * third
 
-    def compute_K(self, dl, avdl):
-        k1 = 1.2
-        b = 0.75
+    def compute_K(self, dl, avdl, k1, b):
         return k1 * ((1-b) + b * (float(dl)/float(avdl)))
 
     def get_length(self, table, docid):
@@ -48,7 +46,7 @@ class BM25Ranking(Ranking):
         return top_pages
 
 
-    def rankDocuments(self, query):
+    def rankDocuments(self, query, max_results):
         query_result = dict()
 
         for term in query:
@@ -61,9 +59,9 @@ class BM25Ranking(Ranking):
                 else:
                     query_result[docid] = score
 
-        return self.get_top_docs(query_result, 10)
+        return self.get_top_docs(query_result, max_results)
 
 if __name__ == "__main__":
     ranking = BM25Ranking()
-    results = ranking.rankDocuments("these words")
+    results = ranking.rankDocuments("syllabus 2017")
 
