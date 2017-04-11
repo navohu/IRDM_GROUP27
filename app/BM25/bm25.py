@@ -1,5 +1,6 @@
 from app.ranking import Ranking
 from math import log
+import operator
 class BM25Ranking(Ranking):
     def __init__(self):
         Ranking.__init__(self)
@@ -36,6 +37,17 @@ class BM25Ranking(Ranking):
             sum += length
         return float(sum) / float(len(table))
 
+    def get_top_docs(self, results, max_results):
+        top_results = sorted(results.iteritems(), key=operator.itemgetter(1), reverse=True)[:max_results]
+        top_pages = []
+        for result in top_results:
+            if result[1] > 0:
+                page = self.db.get_site_by_id(result[0])
+                print (page[1], result[1])
+                top_pages.append(page)
+        return top_pages
+
+
     def rankDocuments(self, query):
         query_result = dict()
 
@@ -49,7 +61,7 @@ class BM25Ranking(Ranking):
                 else:
                     query_result[docid] = score
 
-        return query_result
+        return self.get_top_docs(query_result, 10)
 
 if __name__ == "__main__":
     ranking = BM25Ranking()
