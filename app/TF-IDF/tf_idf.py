@@ -1,16 +1,17 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 import math
-
+from app.ranking import Ranking
+from math import log
 class TFIDFRanking(Ranking):
-	 def __init__(self):
-		Ranking.__init__(self)
+    def __init__(self):
+        Ranking.__init__(self)
 
-	def TF_IDF(self, term, freq, docid):
-		tf = self.db.get_term_freq_doc(term, docid) / self.db.get_doc_length(doc_id)
-		idf = log(self.db.get_num_docs() / self.db.get_term_freq_collection(term)) / log(2)
-		return tf*idf
+    def TF_IDF(self, term, freq, docid):
+        tf = self.db.get_term_freq_doc(term, docid) / self.db.get_doc_length(docid)
+        idf = log(self.db.get_num_docs() / self.db.get_term_freq_collection(term)) / log(2)
+        return tf*idf
 
-	def get_top_docs(self, results, max_results):
+    def get_top_docs(self, results, max_results):
         top_results = sorted(results.iteritems(), key=operator.itemgetter(1), reverse=True)[:max_results]
         top_pages = []
         for result in top_results:
@@ -20,8 +21,8 @@ class TFIDFRanking(Ranking):
                 top_pages.append(page)
         return top_pages
 
-	def rankDocuments(self, query):
-		query_result = dict()
+    def rankDocuments(self, query, max_results):
+        query_result = dict()
         for term in query:
             doc_dict= dict(self.db.get_word_occs(term))
             for docid, freq in doc_dict.iteritems(): #for each document and its word frequency
@@ -31,13 +32,14 @@ class TFIDFRanking(Ranking):
                     query_result[docid] += score
                 else:
                     query_result[docid] = score
-
+                print "Document" + str(docid)
+                print query_result[docid]
         return self.get_top_docs(query_result, max_results)
 
 
 if __name__ == '__main__':
-	ranking = TFIDFRanking()
-	results = ranking.rankDocuments("these words", 10)
+    ranking = TFIDFRanking()
+    results = ranking.rankDocuments("these words", 10)
 
 	# def get_comparisons(self, results):
 	# 	results = dict()

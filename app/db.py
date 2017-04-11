@@ -67,13 +67,14 @@ class MyDB():
         return self.cur.fetchone()[0]
 
     def get_num_docs(self):
-        self.query("""SELECT pg_database.datname, pg_size_pretty(pg_database_size(pg_database.datname)) AS size FROM %(sites)s""",
+        self.query("""SELECT COUNT(*) FROM %(sites)s""",
                   params = {"sites": AsIs(self.sites)})
         return self.cur.fetchone()[0]
 
 if __name__ == "__main__":
     '''Testing'''
     db = MyDB()
-    print db.get_doc_length("http://www.cs.ucl.ac.uk/mobile/home/")
-    print db.get_term_freq_doc('ucl', "http://www.cs.ucl.ac.uk/mobile/home/")
-    print db.get_term_freq_collection('ucl')
+    #print db.get_doc_length("http://www.cs.ucl.ac.uk/mobile/home/")
+    #print db.get_term_freq_doc('ucl', "http://www.cs.ucl.ac.uk/mobile/home/")
+    #print db.get_term_freq_collection('ucl')
+    print db.get_num_docs()

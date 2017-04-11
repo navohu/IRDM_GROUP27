@@ -4,6 +4,7 @@ from nltk.stem.porter import PorterStemmer
 
 from app.boolean.boolean_ranking import BooleanRanking
 from app.query_likelihood.query_likelihood_ranking import QueryLikelihoodRanking
+from app.BM25.bm25 import BM25Ranking
 
 def processQueryTerms(query_terms):
     stop = set(stopwords.words('english'))
@@ -32,7 +33,8 @@ def cleanTitle(title):
 
 if __name__ == "__main__":
     max_results = 10
-    ranking = QueryLikelihoodRanking()
+    #ranking = QueryLikelihoodRanking()
+    ranking = BM25Ranking()
     while True:
         raw_query_terms = raw_input("Enter a search query: ")
         query_terms = processQueryTerms(raw_query_terms)
