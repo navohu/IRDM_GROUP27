@@ -66,6 +66,11 @@ class MyDB():
                 params={"dict": AsIs(self.dict), "term": query_term})
         return self.cur.fetchone()[0]
 
+    def get_num_docs(self):
+        self.query("""SELECT pg_database.datname, pg_size_pretty(pg_database_size(pg_database.datname)) AS size FROM %(sites)s""",
+                  params = {"sites": AsIs(self.sites)})
+        return self.cur.fetchone()[0]
+
 if __name__ == "__main__":
     '''Testing'''
     db = MyDB()
