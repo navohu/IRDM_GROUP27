@@ -22,15 +22,44 @@ class MyDB():
         self.cur.close()
         self.conn.close()
 
-    def get_doc_length(self, doc):
-        self.query("""SELECT stemmed_length FROM %(occs)s AS o JOIN %(sites)s AS s ON o.document_id = s.id WHERE link = %(doc)s""",
-                params={"occs": AsIs(self.occs), "sites": AsIs(self.sites), "doc": doc})
+    def get_doc_ids(self):
+        self.query("""SELECT id FROM %(sites)s""",
+                   params={"sites": AsIs(self.sites)})
+        return self.fetchall()
+
+    def get_site_by_id(self, doc_id):
+        self.query("""SELECT title, link FROM %(sites)s WHERE id = %(doc_id)s""",
+                   params={"sites": AsIs(self.sites), "doc_id": doc_id})
+        site = self.cur.fetchone()
+        if site is None:
+            print 'Document ID', doc_id, 'does not exist'
+            return "Not found"
+        else:
+            return site
+
+    def get_doc_lengths(self):
+        self.query("""SELECT id, stemmed_length FROM %(sites)s""",
+                   params={"sites": AsIs(self.sites)})
+        return self.fetchall()
+
+    def get_word_occs(self, word):
+        self.query("""SELECT document_id, occurrences FROM %(occs)s AS o JOIN %(dict)s AS d ON o.word_id = d.word_id WHERE word = %(w)s""",
+                   params={"occs": AsIs(self.occs), "dict": AsIs(self.dict), "w": word})
+        return self.fetchall()
+
+    def get_doc_length(self, doc_id):
+        self.query("""SELECT stemmed_length FROM %(occs)s AS o JOIN %(sites)s AS s ON o.document_id = s.id WHERE s.id = %(doc_id)s""",
+                params={"occs": AsIs(self.occs), "sites": AsIs(self.sites), "doc_id": doc_id})
         return self.cur.fetchone()[0]
 
-    def get_term_freq_doc(self, query_term, url):
-        self.query("""SELECT occurrences FROM (%(occs)s AS o JOIN %(sites)s AS s ON o.document_id = s.id) AS os JOIN %(dict)s AS d ON d.word_id = os.word_id WHERE d.word = %(term)s AND os.link = %(url)s""",
-                params={"occs": AsIs(self.occs), "sites": AsIs(self.sites), "dict": AsIs(self.dict), "term": query_term, "url": url})
-        return self.cur.fetchone()[0]
+    def get_term_freq_doc(self, query_term, doc_id):
+        self.query("""SELECT occurrences FROM (%(occs)s AS o JOIN %(sites)s AS s ON o.document_id = s.id) AS os JOIN %(dict)s AS d ON d.word_id = os.word_id WHERE d.word = %(term)s AND os.document_id = %(doc_id)s""",
+                params={"occs": AsIs(self.occs), "sites": AsIs(self.sites), "dict": AsIs(self.dict), "term": query_term, "doc_id": doc_id})
+        freq = self.cur.fetchone()
+        if freq is None:
+            return 0
+        else:
+            return freq[0]
 
     def get_term_freq_collection(self, query_term):
         self.query("""SELECT freq FROM %(dict)s WHERE word = %(term)s""",

@@ -1,3 +1,4 @@
+import csv
 import psycopg2
 from psycopg2.extensions import AsIs
 
@@ -13,10 +14,12 @@ class PostIndexing():
         self.cur.close()
         self.conn.close()
 
-    def query(self, query, params=()):
+    def query(self, query, params=(), print_query=True, commit=True):
         self.cur.execute(query, params)
-        print self.cur.query
-        self.conn.commit()
+        if print_query:
+            print self.cur.query
+        if commit:
+            self.conn.commit()
 
     def add_doc_lengths(self, col_name):
         self.query("""ALTER TABLE %(sites)s ADD COLUMN %(col)s BIGINT""",
@@ -41,6 +44,21 @@ class PostIndexing():
                    params={"dict": AsIs(self.dict), "col": AsIs(col_name)})
 
         self.query("DROP TABLE temp_freqs")
+
+    def add_pageranks(self, pageranks):
+        with open("pageranks.csv", "wb") as f:
+            writer = csv.writer(f)
+            writer.writerows(pageranks)
+
+        self.query("""CREATE TABLE temp_pageranks(link VARCHAR, rank NUMERIC)""")
+        with open("pageranks.csv", "r") as f:
+            self.cur.copy_from(f, 'temp_pageranks', sep=",")
+        
+        self.query("""ALTER TABLE %(sites)s ADD COLUMN pagerank NUMERIC""",
+                   params={"sites": AsIs(self.sites)})
+        self.query("""UPDATE %(sites)s SET pagerank = rank FROM temp_pageranks WHERE %(sites)s.link = temp_pageranks.link""",
+                   params={"sites": AsIs(self.sites)})
+        self.query("""DROP TABLE temp_pageranks""")
 
 
 if __name__ == "__main__":

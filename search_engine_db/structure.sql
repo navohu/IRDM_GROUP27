@@ -9,7 +9,9 @@ CREATE TABLE cs_sites (
 	id INTEGER NOT NULL,
 	title VARCHAR,
 	link VARCHAR,
-	stemmed_length BIGINT);
+	stemmed_length BIGINT,
+	raw_length BIGINT,
+	pagerank NUMERIC);
 CREATE TABLE cs_dictionary (
 	word TEXT NOT NULL,
 	word_id BIGINT NOT NULL,
