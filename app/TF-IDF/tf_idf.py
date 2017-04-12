@@ -7,8 +7,8 @@ class TFIDFRanking(Ranking):
         Ranking.__init__(self)
 
     def TF_IDF(self, term, freq, docid):
-        tf = self.db.get_term_freq_doc(term, docid) / self.db.get_doc_length(docid)
-        idf = log(self.db.get_num_docs() / self.db.get_term_freq_collection(term)) / log(2)
+        tf = float(self.db.get_term_freq_doc(term, docid)) / float(self.db.get_doc_length(docid))
+        idf = log(float(self.db.get_num_docs()) / float(self.db.get_term_freq_collection(term))) / log(2)
         return tf*idf
 
     def get_top_docs(self, results, max_results):
