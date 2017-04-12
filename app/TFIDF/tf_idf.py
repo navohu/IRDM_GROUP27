@@ -2,6 +2,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import math
 from app.ranking import Ranking
 from math import log
+import operator
 class TFIDFRanking(Ranking):
     def __init__(self):
         Ranking.__init__(self)
@@ -32,16 +33,13 @@ class TFIDFRanking(Ranking):
             word_occs[term] = dict(self.db.get_word_occs(term))
 
             for docid, freq in doc_dict.iteritems(): #for each document and its word frequency
-                score = self.TF_IDF(term, freq, docid, num_docs, term_freq_coll, doc_lengths[docid], word_occs[term][docid]) # calculate score
+                score = self.TF_IDF(term, freq, docid, num_docs, term_freq_coll, self.doc_lengths[docid], word_occs[term][docid]) # calculate score
 
                 if docid in query_result: #this document has already been scored once
                     query_result[docid] += score
                 else:
                     query_result[docid] = score
-                print "Document" + str(docid)
-                print query_result[docid]
         return self.get_top_docs(query_result, max_results)
-
 
 if __name__ == '__main__':
     ranking = TFIDFRanking()
