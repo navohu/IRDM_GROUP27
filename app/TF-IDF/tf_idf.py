@@ -6,9 +6,9 @@ class TFIDFRanking(Ranking):
     def __init__(self):
         Ranking.__init__(self)
 
-    def TF_IDF(self, term, freq, docid):
+    def TF_IDF(self, term, freq, docid, num_docs, term_freq_coll):
         tf = float(self.db.get_term_freq_doc(term, docid)) / float(self.db.get_doc_length(docid))
-        idf = log(float(self.db.get_num_docs()) / float(self.db.get_term_freq_collection(term))) / log(2)
+        idf = log(float(num_docs) / float(term_freq_coll)) / log(2)
         return tf*idf
 
     def get_top_docs(self, results, max_results):
@@ -23,10 +23,14 @@ class TFIDFRanking(Ranking):
 
     def rankDocuments(self, query, max_results):
         query_result = dict()
+        num_docs = self.db.get_num_docs()
+
         for term in query:
             doc_dict= dict(self.db.get_word_occs(term))
+            term_freq_coll = self.db.get_term_freq_collection(term)
+
             for docid, freq in doc_dict.iteritems(): #for each document and its word frequency
-                score = self.TF_IDF(term, freq, docid) # calculate score
+                score = self.TF_IDF(term, freq, docid, num_docs, term_freq_coll) # calculate score
 
                 if docid in query_result: #this document has already been scored once
                     query_result[docid] += score
