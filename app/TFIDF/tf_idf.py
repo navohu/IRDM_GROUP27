@@ -43,22 +43,3 @@ if __name__ == '__main__':
     ranking = TFIDFRanking()
     results = ranking.rankDocuments("these words", 10)
 
-	# def get_comparisons(self, results):
-	# 	results = dict()
-	# 	for count_0, doc_0 in enumerate(tfidf.toarray()):
-	# 		for count_1, doc_1 in enumerate(tfidf.toarray()):
-	# 			if count_1 <= count_0:
-	# 				continue
-	# 			else:
-	# 				results.append((cosine_similarity(doc_0, doc_1), count_0, count_1))
-	# 	return results
-
-	# self.doc_lengths = dict(self.db.get_doc_lengths())
-	# self.dlt = dict(self.db.get_doc_lengths())
-
-	# def cosine_similarity(self, vector1, vector2):
-	# 	dot_product = sum(p*q for p,q in zip(vector1, vector2))
-	# 	magnitude = math.sqrt(sum([val**2 for val in vector1])) * math.sqrt(sum([val**2 for val in vector2]))
-	# 	if not magnitude:
-	# 		return 0
-	# 	return dot_product/magnitude
