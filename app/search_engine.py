@@ -47,9 +47,11 @@ def get_top_docs(results, max_results):
     return top_pages
 
 def write_csv(results, filename):
-    with open(filename, 'wb') as csvfile:
-        spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        spamwriter.writerow(results)
+    csvfile = open(filename, 'w')
+    wr = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_ALL)
+    
+    #for row in results:    
+    wr.writerow(results)
 
 if __name__ == "__main__":
     max_results = 10
