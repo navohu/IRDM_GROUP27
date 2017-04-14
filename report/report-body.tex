@@ -96,10 +96,25 @@ where \emph{r} is the PageRank, \emph{$I_i$} is the inlinks of state \emph{i}, \
 
 % subsubsection boolean_retrieval (end)
 
+\subsubsection{TF-IDF} % (fold)
+\label{sub:tf_idf}
+
+TF-IDF is a type of ranking algorithm that is based off of reflecting how important a certain word is within a document in a collection. Normally, it is used as a weighting factor but can also be used for pure ranking given a query term. It is based on two concepts: the term frequency (TF) and the inverse document frequency (IDF). The two terms have been implemented in the search engine using these equations:
+
+$$TF = \frac{f_{t,d}}{\sum\limits_{t' \in d} f_{t,d}}$$
+
+$$IDF = log_2 \frac{N}{n_t}$$
+
+where $f_{t,d}$ is the number of term occurrences within a document, while the summation is the length of the document. \emph{N} is the number of documents in collection and $n_t$ is the term frequency in the collection. The documents would then be ranked based on the product of $TF * IDF$ and will display all the documents in order. 
+
+% subsection tf_idf (end)
+
 \subsubsection{BM25} % (fold)
 \label{ssub:BM25}
 
-BM25 improves upon TF-IDF. It stands for Best Match 25 and is designed for modern full-text search collection. It pays additional attention to the term frequency and document length. Classic IDF has the potential for giving negative scores for terms with very high document frequency. On the other hand, the IDF in BM25 adds 1 to the value before taking the logarithm, which makes it impossible to compute a negative value. Term frequency in BM25 dampens the impact of term frequency even further than traditional TF-IDF. The impact of term frequency is always increasing, but asymptotically approaches a value. In BM25, the TF score also depends on the document length. If the document length is below the average, then the TF score will get a bonus. 
+BM25 is another type of ranking algorithm developed by Karen Spärck Jones. It is a newer and improved version of TF-IDF. The BM25 belongs to the probabilistic models and uses the "bag of words" concept for retrieving relevant documents from a given search query. 
+
+The difference is that it pays additional attention to the term frequency and the document length. Classic IDF has the potential for giving negative scores for terms with very high document frequency. On the other hand, the IDF in BM25 adds 1 to the value before taking the logarithm, which makes it impossible to compute negative values. Term frequency in BM25 dampens the impact of term frequency even further than traditional TF-IDF. The impact of term frequency is always increasing, but asymptotically approaches a value. In BM25, the TF score also depends on the document length. If the document length is below the average, then the TF score will get a bonus. 
 
 The formula to adjust the TF score based on the document length is as below where b and k are constants and L is the length of document:
 \[\frac{(k + 1) * TF}{k * (1.0 - b + b * L) + TF}\]

@@ -28,14 +28,7 @@ class QueryLikelihoodRanking(Ranking):
 				else:
 					max_likelihood = float(tf) / doc_length
 				likelihood_scores[doc_id] *= max_likelihood
-		top_results = sorted(likelihood_scores.iteritems(), key=operator.itemgetter(1), reverse=True)[:max_results]
-		top_pages = []
-		for result in top_results:
-			if result[1] > 0:
-				page = self.db.get_site_by_id(result[0])
-				print (page[1], result[1])
-				top_pages.append(page)
-		return top_pages
+		return likelihood_scores
 
 if __name__ == "__main__":
 	ranking = QueryLikelihoodRanking()

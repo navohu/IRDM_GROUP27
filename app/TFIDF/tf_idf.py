@@ -13,15 +13,12 @@ class TFIDFRanking(Ranking):
         idf = log(float(num_docs) / float(term_freq_coll)) / log(2)
         return tf*idf
 
-    def get_top_docs(self, results, max_results):
-        top_results = sorted(results.iteritems(), key=operator.itemgetter(1), reverse=True)[:max_results]
-        top_pages = []
-        for result in top_results:
-            if result[1] > 0:
-                page = self.db.get_site_by_id(result[0])
-                print (page[1], result[1])
-                top_pages.append(page)
-        return top_pages
+    def cosine_similarity(vector1, vector2):
+        dot_product = sum(p*q for p,q in zip(vector1, vector2))
+        magnitude = math.sqrt(sum([val**2 for val in vector1])) * math.sqrt(sum([val**2 for val in vector2]))
+        if not magnitude:
+            return 0
+        return dot_product/magnitude
 
     def rankDocuments(self, query, max_results):
         query_result = dict()
@@ -39,7 +36,7 @@ class TFIDFRanking(Ranking):
                     query_result[docid] += score
                 else:
                     query_result[docid] = score
-        return self.get_top_docs(query_result, max_results)
+        return query_result
 
 if __name__ == '__main__':
     ranking = TFIDFRanking()

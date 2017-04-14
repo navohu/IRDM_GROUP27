@@ -1,4 +1,5 @@
 import psycopg2
+import csv
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 
@@ -32,16 +33,33 @@ def cleanTitle(title):
         title = title[1:len(title)-1]
     return title
 
+def get_top_docs(self, results, max_results):
+    top_results = sorted(results.iteritems(), key=operator.itemgetter(1), reverse=True)[:max_results]
+    top_pages = []
+    for result in top_results:
+        if result[1] > 0:
+            page = self.db.get_site_by_id(result[0])
+            # print (page[1], result[1])
+            top_pages.append(page)
+    return top_pages
+
+def write_csv(results, filename):
+    with open(filename, 'wb') as csvfile:
+    spamwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    spamwriter.writerow(results)
+
 if __name__ == "__main__":
     max_results = 10
     #ranking = QueryLikelihoodRanking()
-    #ranking = BM25Ranking()
-    ranking = TFIDFRanking()
+    ranking = BM25Ranking()
+    # ranking = TFIDFRanking()
     while True:
         raw_query_terms = raw_input("Enter a search query: ")
         query_terms = processQueryTerms(raw_query_terms)
         print "Searching for ", query_terms
-        matches = ranking.rankDocuments(query_terms, max_results)
+        results = ranking.rankDocuments(query_terms)
+        write_csv(results, ("./results/BM25Ranking_" + query_terms))
+        matches = get_top_docs(results, max_results)
 
         print "Results"
         for match in matches:
