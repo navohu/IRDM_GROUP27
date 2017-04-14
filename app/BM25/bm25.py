@@ -35,7 +35,7 @@ class BM25Ranking(Ranking):
             sum += length
         return float(sum) / float(len(table))
 
-    def rankDocuments(self, query, max_results):
+    def rankDocuments(self, query):
         query_result = dict()
 
         for term in query:
