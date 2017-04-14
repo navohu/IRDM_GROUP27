@@ -56,11 +56,13 @@ if __name__ == "__main__":
     while True:
         raw_query_terms = raw_input("Enter a search query: ")
         query_terms = processQueryTerms(raw_query_terms)
+
         print "Searching for ", query_terms
         results = ranking.rankDocuments(query_terms)
         write_csv(results, ("./results/BM25Ranking_" + query_terms))
         matches = get_top_docs(results, max_results)
 
-        print "Results"
+
+        print ("Results")
         for match in matches:
-                print "\t", cleanTitle(match[0]), "\n\t\t", match[1]
+                print ("\t", cleanTitle(match[0]), "\n\t\t", match[1])
