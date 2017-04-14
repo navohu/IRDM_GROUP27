@@ -17,3 +17,5 @@ class BooleanRanking(Ranking):
 	def documentsWithAllTerms(self, query_terms, max_results=5):
 		self.db.cur.execute("""SELECT title, link FROM (SELECT w.word_id, document_id, occurrences FROM cs_dictionary AS d JOIN cs_word_occurrences AS w ON d.word_id = w.word_id WHERE word = ANY(%s)) AS wd JOIN cs_sites AS s ON wd.document_id = s.id GROUP BY document_id, title, link HAVING count(word_id) = %s""", (query_terms, len(query_terms),))
 		return self.db.cur.fetchmany(max_results)
+
+a=BooleanRanking(Ranking)
