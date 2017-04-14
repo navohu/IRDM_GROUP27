@@ -20,7 +20,7 @@ class TFIDFRanking(Ranking):
             return 0
         return dot_product/magnitude
 
-    def rankDocuments(self, query, max_results):
+    def rankDocuments(self, query):
         query_result = dict()
         num_docs = self.db.get_num_docs()
         word_occs= {}

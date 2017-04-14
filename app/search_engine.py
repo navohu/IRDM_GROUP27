@@ -53,20 +53,28 @@ def write_csv(results, filename):
     #for row in results:    
     wr.writerow(results)
 
+def deal_with_boolean(results):
+    matches = []
+    for result in results:
+        matches.append(result[1])
+    return matches
+
 if __name__ == "__main__":
     max_results = 10
     #ranking = QueryLikelihoodRanking()
-    ranking = BM25Ranking()
-    # ranking = TFIDFRanking()
+    #ranking = BM25Ranking()
+    #ranking = TFIDFRanking()
+    ranking = BooleanRanking()
     while True:
         raw_query_terms = raw_input("Enter a search query: ")
         query_terms = processQueryTerms(raw_query_terms)
 
         print "Searching for ", query_terms
         results = ranking.rankDocuments(query_terms)
-        matches = get_top_docs(results, max_results)
+        #matches = get_top_docs(results, max_results)
+        matches = deal_with_boolean(results)
         print matches
-        write_csv(matches, ("./results/BM25Ranking_" + query_terms[0]+ ".csv"))
+        write_csv(matches, ("./results/BooleanRanking_" + query_terms[0]+ ".csv"))
 
         #print ("Results")
         #for match in matches:
