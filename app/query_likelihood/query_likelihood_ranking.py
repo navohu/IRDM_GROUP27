@@ -7,7 +7,7 @@ class QueryLikelihoodRanking(Ranking):
 		Ranking.__init__(self)
 		self.doc_lengths = dict(self.db.get_doc_lengths())
 
-	def rankDocuments(self, query_terms, max_results):
+	def rankDocuments(self, query_terms):
 		likelihood_scores = {}
 		word_occs = {}
 		for term in query_terms:
