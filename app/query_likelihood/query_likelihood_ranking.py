@@ -8,17 +8,7 @@ class QueryLikelihoodRanking(Ranking):
 		self.doc_lengths = dict(self.db.get_doc_lengths())
 		self.words_in_collection = sum(self.doc_lengths.itervalues())
 
-	def getTopDocs(self, results, max_results):
-		top_results = sorted(likelihood_scores.iteritems(), key=operator.itemgetter(1), reverse=True)[:max_results]
-		top_pages = []
-		for result in top_results:
-			if result[1] > 0:
-				page = self.db.get_site_by_id(result[0])
-				print (page[1], result[1])
-				top_pages.append(page)
-		return top_pages
-
-	def rankDocuments(self, query_terms, max_results):
+	def rankDocuments(self, query_terms):
 		likelihood_scores = {}
 		word_occs = {}
 		lambdaRatio = 0.8
@@ -40,7 +30,7 @@ class QueryLikelihoodRanking(Ranking):
 				term_likelihood = lambdaRatio * tf + (1 - lambdaRatio) * bg_prob
 				max_likelihood = float(term_likelihood) / doc_length
 				likelihood_scores[doc_id] *= max_likelihood
-		return self.getTopDocs(likelihood_scores, max_results)
+		return likelihood_scores
 
 if __name__ == "__main__":
 	ranking = QueryLikelihoodRanking()

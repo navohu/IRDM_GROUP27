@@ -35,18 +35,7 @@ class BM25Ranking(Ranking):
             sum += length
         return float(sum) / float(len(table))
 
-    def get_top_docs(self, results, max_results):
-        top_results = sorted(results.iteritems(), key=operator.itemgetter(1), reverse=True)[:max_results]
-        top_pages = []
-        for result in top_results:
-            if result[1] > 0:
-                page = self.db.get_site_by_id(result[0])
-                print (page[1], result[1])
-                top_pages.append(page)
-        return top_pages
-
-
-    def rankDocuments(self, query, max_results):
+    def rankDocuments(self, query):
         query_result = dict()
 
         for term in query:
@@ -58,8 +47,7 @@ class BM25Ranking(Ranking):
                     query_result[docid] += score
                 else:
                     query_result[docid] = score
-
-        return self.get_top_docs(query_result, max_results)
+        return query_result
 
 if __name__ == "__main__":
     ranking = BM25Ranking()
