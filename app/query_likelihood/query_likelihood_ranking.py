@@ -14,11 +14,12 @@ class QueryLikelihoodRanking(Ranking):
 	def rankDocuments(self, query_terms):
 		likelihood_scores = {}
 		word_occs = {}
+		bg_prob = {}
 		lambdaRatio = 0.8
 		for term in query_terms:
 			word_occs[term] = dict(self.db.get_word_occs(term))
 			print term, 'appears in ', len(word_occs[term]), 'documents'
-			bg_prob = float(self.db.get_term_freq_collection(term)) / self.words_in_collection
+			bg_prob[term] = float(self.db.get_term_freq_collection(term)) / self.words_in_collection
 		for doc_id in self.doc_lengths:
 			doc_length = self.doc_lengths[doc_id]
 			if doc_length is None or doc_length == 0:
@@ -30,7 +31,7 @@ class QueryLikelihoodRanking(Ranking):
 					tf = word_occs[term][doc_id]
 				else:
 					tf = 0
-				term_likelihood = lambdaRatio * tf + (1 - lambdaRatio) * bg_prob
+				term_likelihood = lambdaRatio * tf + (1 - lambdaRatio) * bg_prob[term]
 				max_likelihood = float(term_likelihood) / doc_length
 				likelihood_scores[doc_id] *= max_likelihood
 		return likelihood_scores
