@@ -59,23 +59,44 @@ def deal_with_boolean(results):
         matches.append(result[1])
     return matches
 
+def get_rank(x):
+    return {
+        1: TFIDFRanking(),
+        2: BM25Ranking(),
+        3: QueryLikelihoodRanking(),
+    }[x]
+
+def pagerank_contrib(results):
+    # get doc_id of certain result
+    # multiply that doc_id with the pagerank of that doc_id
+    print results
+
 if __name__ == "__main__":
     max_results = 30
-    ranking = QueryLikelihoodRanking()
+    #ranking = QueryLikelihoodRanking()
     #ranking = BM25Ranking()
     #ranking = TFIDFRanking()
     #ranking = BooleanRanking()
     while True:
+        raw_ranking = raw_input("""Select the ranking algorithm you want to use: 
+                \n (1) TFIDF
+                \n (2) BM25
+                \n (3) Query Likelihood""")
+        ranking = get_rank(raw_ranking)
+        pagrank = raw_input("Do you want it with PageRank? Y/N")
+
         raw_query_terms = raw_input("Enter a search query: ")
         query_terms = processQueryTerms(raw_query_terms)
 
         print "Searching for ", query_terms
         results = ranking.rankDocuments(query_terms)
+        if pagrank == "Y":
+            pagerank_contrib(results)
         matches = get_top_docs(results, max_results)
         #matches = deal_with_boolean(results)
-        print matches
-        write_csv(matches, ("./results/QueryLikelihoodRanking_" + query_terms[0]+ ".csv"))
+        # print matches
+        # write_csv(matches, ("./results/QueryLikelihoodRanking_" + query_terms[0]+ ".csv"))
 
-        #print ("Results")
-        #for match in matches:
-         #       print ("\t", cleanTitle(match[0]), "\n\t\t", match[1])
+        print ("Results")
+        for match in matches:
+               print ("\t", cleanTitle(match[0]), "\n\t\t", match[1])
