@@ -83,6 +83,8 @@ class MyDB():
     def get_pagerank(self, doc_id):
         self.query("""SELECT pagerank FROM %(sites)s WHERE id = %(doc_id)s""",
                 params={"sites": AsIs(self.sites), "doc_id": doc_id})
+        return self.cur.fetchone()[0]
+
 
 if __name__ == "__main__":
     '''Testing'''
