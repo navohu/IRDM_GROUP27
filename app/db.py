@@ -50,7 +50,12 @@ class MyDB():
     def get_doc_length(self, doc_id):
         self.query("""SELECT stemmed_length FROM %(occs)s AS o JOIN %(sites)s AS s ON o.document_id = s.id WHERE s.id = %(doc_id)s""",
                 params={"occs": AsIs(self.occs), "sites": AsIs(self.sites), "doc_id": doc_id})
-        return self.cur.fetchone()[0]
+        length = self.cur.fetchone()
+        if length is None:
+            print 'Document ID', doc_id, 'does not exist'
+            return "Not found"
+        else:
+            return length
 
     def get_term_freq_doc(self, query_term, doc_id):
         self.query("""SELECT occurrences FROM (%(occs)s AS o JOIN %(sites)s AS s ON o.document_id = s.id) AS os JOIN %(dict)s AS d ON d.word_id = os.word_id WHERE d.word = %(term)s AND os.document_id = %(doc_id)s""",
@@ -64,7 +69,11 @@ class MyDB():
     def get_term_freq_collection(self, query_term):
         self.query("""SELECT freq FROM %(dict)s WHERE word = %(term)s""",
                 params={"dict": AsIs(self.dict), "term": query_term})
-        return self.cur.fetchone()[0]
+        freq = self.cur.fetchone()
+        if freq is None:
+            return 0
+        else:
+            return freq[0]
 
     def get_num_docs(self):
         self.query("""SELECT COUNT(*) FROM %(sites)s""",
