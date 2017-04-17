@@ -1,6 +1,16 @@
 \section{Introduction}
 
-TODO:
+At the late end of the 20th century a need of quickly obtain information on the World Wide Web developed. As a result of this, search engines were developed and are one of the most common methods to find information online today. Competition between the different search engines has been present since the start, but Google has clearly ruled the market. It's name has been famous because of its algorithms that have outperformed the other search engines. Not all of the algorithms that the Google search engine is using are known. Those who are known have been present through decades, such as TF-IDF, BM25, PageRank and query likelihood ranking.
+
+The aim of this report is to explore existing algorithms for information retrieval and how they perform against each other. The search engine was implemented on the "cs.ucl.ac.uk" domain and includes several preprocessing techniques and data transformations. The application includes implementations of several ranking algorithms and an evaluation of the results. The search engine application built for this project can be found on \url{github.com/navohu.......}and has been implemented in Python\footnote{All instructions for running the application can be found in the README file in the repository.}. Initially, our expectations for the project was to produce results that showed the difference of the current working algorithms, as well as an implementation of a deep learning algorithm. Since our project only included a search on the CS website it would imply that the amount of data might not be sufficient for a deep learning approach.
+
+
+
+TODO: Our results ... compare the different ranking algorithms with and without PageRank. Explain what metric showed the best results.
+
+
+This report will first explain different discoveries within the field of information retrieval, followed by an experiment section. This section will explore the methodology of how we created the search engine like setting up the database, programming the crawler and implementing the algorithms. Followed by the methodology section we will introduce the metrics we used in our evaluation, as well as defining which evaluation methods we would like to use. The results will finally be analysed and a discussion about the project and its limitations will be provided.
+
 
 \section{Related Work}
 Creating an ranking results in a search engine can be done through many different algorithms. This related work section will explore the literature covering two types of algorithms used for ranking the documents based on the query: non-probabilistic and probabilistic. Then we will investigate how to evaluate the results, based on a test set. Deep Learning is also a new topic that has caught attention, and will therefore be reviewed in terms of how it can be used in search engines.
@@ -27,6 +37,8 @@ Many of these algorithm are commonly used in web search today and the rest of th
 
 \section{Experiment} % (fold)
 \label{sec:experiment}
+
+This section will present the overall methodology of building a search engine. The whole methodology is freely and easily adaptable since it's using open source Python libraries and a free instance of an Amazon server. There are five main algorithms that have been implemented and compared against in this project: Boolean Retrieval, TFIDF, BM25, query likelihood estimation and PageRank. The assortment of algorithms were chosen by a thorough examination of the current literature in the field. We wanted to test algorithms that were known to be both very accurate and some that were less accurate in order to receive a full view of the the most known algorithms in the field, and the main differences between them. 
 
 \subsection{Dataset Description} % (fold)
 \label{sub:dataset_description}
@@ -197,6 +209,8 @@ $$recall = \frac{|relevant documents \cap retrieved documents|}{|relevant docume
 Different type of implementation of TF-IDF and BM25, but we have only chosen some. 
 Limitations about the crawler - did it really get everything? Depth issue.
 
+Hard to show good differences when the test result was this small.
+
 % section discussion_&_limitations (end)
 
 \section{Conclusion} % (fold)
@@ -208,72 +222,5 @@ Limitations about the crawler - did it really get everything? Depth issue.
 \label{sec:references}
 
 % section references (end)
-
-
-% \begin{equation}
-%   \lim_{n\rightarrow \infty}x=0
-% \end{equation}
-% Notice how it is formatted somewhat differently in
-% the \textbf{displaymath}
-% environment.  Now, we'll enter an unnumbered equation:
-% \begin{displaymath}
-%   \sum_{i=0}^{\infty} x + 1
-% \end{displaymath}
-% and follow it with another numbered equation:
-% \begin{equation}
-%   \sum_{i=0}^{\infty}x_i=\int_{0}^{\pi+2} f
-% \end{equation}
-% just to demonstrate \LaTeX's able handling of numbering.
-
-
-% \begin{table}
-%   \caption{Frequency of Special Characters}
-%   \label{tab:freq}
-%   \begin{tabular}{ccl}
-%     \toprule
-%     Non-English or Math&Frequency&Comments\\
-%     \midrule
-%     \O & 1 in 1,000& For Swedish names\\
-%     $\pi$ & 1 in 5& Common in math\\
-%     \$ & 4 in 5 & Used in business\\
-%     $\Psi^2_1$ & 1 in 40,000& Unexplained usage\\
-%   \bottomrule
-% \end{tabular}
-% \end{table}
-
-
-% \begin{table*}
-%   \caption{Some Typical Commands}
-%   \label{tab:commands}
-%   \begin{tabular}{ccl}
-%     \toprule
-%     Command &A Number & Comments\\
-%     \midrule
-%     \texttt{{\char'134}author} & 100& Author \\
-%     \texttt{{\char'134}table}& 300 & For tables\\
-%     \texttt{{\char'134}table*}& 400& For wider tables\\
-%     \bottomrule
-%   \end{tabular}
-% \end{table*}
-% % end the environment with {table*}, NOTE not {table}!
-
-% Lists:
-% \begin{enumerate}
-% \item Never, ever use vertical rules.
-% \item Never use double rules.
-% \end{enumerate}
-% It is also a good idea not to overuse horizontal rules.
-
-% Figures
-%\begin{figure}
-%\includegraphics{fly}
-%\caption{A sample black and white graphic.}
-%\end{figure}
-%
-%\begin{figure}
-%\includegraphics[height=1in, width=1in]{fly}
-%\caption{A sample black and white graphic
-%that has been resized with the \texttt{includegraphics} command.}
-%\end{figure}
 
 
