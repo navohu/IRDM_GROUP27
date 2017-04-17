@@ -51,9 +51,10 @@ def get_top_docs(results, max_results):
 def write_csv(results, filename):
     csvfile = open(filename, 'w')
     wr = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_ALL)
-    
-    #for row in results:    
-    wr.writerow(results)
+    data = []
+    for result in results:
+        data.append(result[1]) 
+    wr.writerow(data)
 
 def deal_with_boolean(results):
     matches = []
@@ -94,19 +95,22 @@ if __name__ == "__main__":
                 \n
                 \n Enter number here: """)
         ranking = get_rank(raw_ranking)
-        pagrank = raw_input("Do you want it with PageRank? Y/N \n")
+        pagerank = raw_input("Do you want it with PageRank? Y/N \n")
 
         raw_query_terms = raw_input("Enter a search query: ")
         query_terms = processQueryTerms(raw_query_terms)
 
         print "Searching for ", query_terms
         results = ranking.rankDocuments(query_terms)
-        if pagrank == "Y" or "yes" or "y":
+        if pagerank == "Y" or "yes" or "y":
             results = pagerank_contrib(results)
         matches = get_top_docs(results, max_results)
         #matches = deal_with_boolean(results)
         # print matches
-        # write_csv(matches, ("./results/QueryLikelihoodRanking_" + query_terms[0]+ ".csv"))
+        if pagerank == "Y" or "yes" or "y":
+            write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_PR_" + query_terms[0]+ ".csv"))
+        else:
+            write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_" + query_terms[0]+ ".csv"))
 
         print ("Results")
         for match in matches:
