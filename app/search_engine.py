@@ -47,7 +47,7 @@ def get_top_docs(results, max_results, rank):
     for result in top_results:
         page_id = result[0]
         relevance = result[1]
-        if relevance > 0:
+        if relevance > 0.0:
             url = urls[page_id]
             title = titles[page_id]
             #print (page[0], page[1])

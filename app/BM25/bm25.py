@@ -7,16 +7,15 @@ class BM25Ranking(Ranking):
         self.doc_lengths = dict(self.db.get_doc_lengths())
         self.dlt = dict(self.db.get_doc_lengths())
         
-    def score_BM25(self, n, f, qf, r, N, dl, avdl):
+    def score_BM25(self, n, f, N, dl, avdl):
         k1 = 1.2
-        k2 = 100
         b = 0.75
-        R = 0.0
-        K = self.compute_K(dl, avdl, k1, b)
-        first = log( ( (r + 0.5) / (R - r + 0.5) ) / ( (n - r + 0.5) / (N - n - R + r + 0.5)) )
-        second = ((k1 + 1) * f) / (K + f)
-        third = ((k2+1) * qf) / (k2 + qf)
-        return first * second * third
+        first = log((N-n+0.5)/(n+0.5))
+        if first <= 0.001:
+            first = 0.001
+        second = f * (k1 +1)
+        third = f + k1 * (1-b + b*(dl/avdl))
+        return first * (second / third)
 
     def compute_K(self, dl, avdl, k1, b):
         return k1 * ((1-b) + b * (float(dl)/float(avdl)))
@@ -35,6 +34,7 @@ class BM25Ranking(Ranking):
             sum += length
         return float(sum) / float(len(table))
 
+
     def rankDocuments(self, query):
         query_result = dict()
 
@@ -42,7 +42,7 @@ class BM25Ranking(Ranking):
             doc_dict= dict(self.db.get_word_occs(term))
             n = len(doc_dict)
             for docid, freq in doc_dict.iteritems(): #for each document and its word frequency
-                score = self.score_BM25(n, freq, 1, 0, len(self.dlt), self.get_length(self.dlt,docid), self.get_average_length(self.dlt)) # calculate score
+                score = self.score_BM25(n, freq, len(self.dlt), self.get_length(self.dlt,docid), self.get_average_length(self.dlt)) # calculate score
                 if docid in query_result: #this document has already been scored once
                     query_result[docid] += score
                 else:
