@@ -275,6 +275,34 @@ moodle  & 4     & 4               & 4      \\ \hline
 \end{tabular}
 \end{table}
 
+\textbf{TIME}
+
+\begin{table}[]
+\centering
+\caption{Time of queries with PageRank}
+\label{tab:time}
+\begin{tabular}{|l|l|}
+\hline
+        & Time  \\ \hline
+BM25            & 4.61880669593811 \\ \hline
+QueryLikelihood & 2.1089548110961913\\ \hline
+TF-IDF          & 2.9961967706680297\\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[]
+\centering
+\caption{Time of queries without PageRank}
+\label{tab:time_pr}
+\begin{tabular}{|l|l|l|l|}
+\hline
+        & Time  \\ \hline
+BM25            & 4.011985206604004 \\ \hline
+QueryLikelihood & 1.2295216083526612\\ \hline
+TF-IDF          & 2.109076404571533 \\ \hline
+\end{tabular}
+\end{table}
+
 % subsection analysis_of_results (end)
 
 % section experiment (end)

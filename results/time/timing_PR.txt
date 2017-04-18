@@ -1,0 +1,6 @@
+BM25Ranking
+{'computer graphics syllabus': 9.106604099273682, 'degree': 1.716339111328125, 'information retrieval and data mining': 5.7115797996521, 'moodle': 1.9098889827728271, 'alphago': 1.1360158920288086, 'jun wang': 2.1569910049438477}
+TFIDFRanking
+{'computer graphics syllabus': 4.6198389530181885, 'degree': 2.0567259788513184, 'information retrieval and data mining': 5.17057204246521, 'moodle': 1.715980052947998, 'alphago': 2.822183132171631, 'jun wang': 5.105518102645874}
+QueryLikelihoodRanking
+{'computer graphics syllabus': 2.4807820320129395, 'degree': 2.396683931350708, 'information retrieval and data mining': 3.6058108806610107, 'moodle': 2.086313009262085, 'alphago': 1.9340298175811768, 'jun wang': 2.850745916366577}
