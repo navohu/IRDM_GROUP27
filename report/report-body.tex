@@ -304,13 +304,11 @@ moodle  & 4     & 4               & 4      \\ \hline
 \label{sec:discussion_&_limitations}
 
 Different type of implementation of TF-IDF and BM25, but we have only chosen some. 
-Limitations about the crawler - did it really get everything? Depth issue.
+Our project has so far only considered a subset of existing algorithms. In order to get a wider picture of the different algorithms, it could be a good idea to include even more ranking algorithms. Also, some additional weighting algorithms could also be included in order to increase the accuracy of our results, such as HITS algorithm.
 
-Hard to show good differences when the test result was this small.
+One of the major limitations in this project was circled around the crawler. The framework Scrapy was not written by us and we would not necessarily know that the crawler did exactly what we asked for. Scrapy retrieved lower amount of pages that expected and therefore made us question its quality. Since this was discovered relatively late, there were no time to try to get used to a new framework. Hence, when analysing the results it must be taken into consideration that the crawler might not have caught all the links in the CS domain. Also the problem with not crawling everything might have been because a max depth was set. Although the crawler indicated that it would take around 20 days without the depth, a further look into improving this should be made.
 
-No time for deep learning.
-
-
+During the evaluation we had a limitation in our test set. The test set could be increased to compare even more queries, but because of time limitation we were not able to implement any more queries. This limits the credibility of our results, even though they are still sufficient to some extent. For future implementation we would like to implement a Deep Learning task, but because of lack of time and problems of contribution within the team this would be very difficult to finish in time. 
 
 % section discussion_&_limitations (end)
 
