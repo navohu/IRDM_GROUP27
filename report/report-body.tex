@@ -61,40 +61,11 @@ The methodology includes a wide range of steps and exploration in order to build
 
 The search engine is run on an Amazon EC2 instance that provided secure and resizeable computing capacity. It is usually good practice to run heavy loaded applications -- such as a search engine -- on a cloud computing service. As a rule, there are more computing resources available, and these are more scalable and robust than on a local machine. Another advantage is that it's possible to set up a database instance which can be accessed by anyone. Our project is using a PostgreSQL database within RDS which can be accessed by the search engine running on either the EC2 server or a local machine outside AWS, if needed. However, due to geographical proximity of AWS services, faster performance can be observed from the EC2.\\
 
-We designed our database schema in such a way that it would be easy for our application to access the data when processing the rankings. Our crawler writes to a table called \emph{cs\_cites}, built to hold the titles, urls and unique IDs of web pages within the CS domain.
-%\begin{center}
-%  \begin{tabular}{|c|c|c|}
-%  id & title & link
-%  \end{tabular}
-%\end{center}
-Later on in the progress, an inverted index is created and would eventually add additional columns to the \emph{cs\_sites} table. The inverted index consisted of two tables in the database. One table would consist of the relationship between $word\_id$, the $document\_id$ and the word occurrence of that word within that document, like shown in the table below. The \emph{document\_id} is taken from the \emph{cs\_sites} table.
+%We designed our database schema in such a way that it would be easy for our application to access the data when processing the rankings. To reduce redundancy and the risk of inconsistency, website links, content words and titles are each only stored once and referenced by foreign key IDs in other tables.
+We designed our database schema with expandability, consistency, and ease of access in mind. It is mainly made up of tables \emph{cs\_sites}, \emph{cs\_dictionary} and \emph{cs\_word\_occurrence}, prefaced by \emph{cs} to allow further domains to be readily added. Furthermore, the database contains \emph{raw} dictionary and word occurrence tables (with the word \emph{raw} referring to unprocessed document terms), which can be used to isolate the effect of stopping and stemming on the final results.
 
-\begin{table}[h!]
-  \begin{tabular}{|c|c|c|}
-  \hline
-  word\_id & document\_id & occurrences \\ \hline 
-  1 & 4 & 2 \\\hline
-  1 & 2 & 5 \\\hline
-  2 & 1 & 1 \\\hline
-  3 & 1 & 4 \\\hline
-  3 & 3 & 6 \\\hline
-  3 & 2 & 3 \\\hline
-  ... & ... & ...
-  \end{tabular}
-\end{table}
-
-The \emph{word\_id} is mapped within yet another table called \emph{cs\_dictionary} and has the structure as shown in the table below. The \emph{frequency} is the number of word occurrences in the whole collection.
-
-\begin{table}[h!]
-  \begin{tabular}{|c|c|c|}
-  \hline
-  word\_id & word & frequency \\ \hline 
-  1 & chemistry & 7 \\\hline
-  2 & computer & 1 \\\hline
-  3 &science & 13 \\\hline
-  ... & ... & ...
-  \end{tabular}
-\end{table}
+Our crawler writes to \emph{cs\_cites}, built to hold the titles, URLs and unique IDs of web pages within the CS domain.
+Based on these URLs, an inverted index is created, consisting of a dictionary that maps words to their IDs and collection-wide frequencies, and of a word occurrence table, which lists $word\_id$ -- $document\_id$ pairs and their frequencies. After the index is constructed, \emph{cs\_sites} is supplemented with document length and pagerank data.
 
 % subsubsection database_and_server_setup (end)
 
