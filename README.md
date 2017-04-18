@@ -7,7 +7,9 @@
 Create a `.pgpass` file in your home directory with the following contents: `<hostname>:<port>:<database>:<username>:<password>`
 
 ##### Install all requirements
-~~~~pip install -r requirements~~~~
+~~~~
+pip install -r requirements
+~~~~
 
 ##### Run the search engine
 From the top-level directory, run `python -m app.search_engine`
