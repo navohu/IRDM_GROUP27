@@ -1,4 +1,5 @@
 import time
+import csv
 from app.ranking import Ranking
 from app.search_engine import SearchEngine
 from app.query_likelihood.query_likelihood_ranking import QueryLikelihoodRanking
@@ -9,8 +10,16 @@ class Timing():
     def __init__(self):
         self.search = SearchEngine()
 
+    def write_csv(self, results, filename, perm):
+        csvfile = open(filename, perm)
+        wr = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_ALL)
+        data = []
+        for result in results:
+            data.append(result) 
+        wr.writerow(data)
+
     def produce_time(self, queries, ranking, use_pagerank):
-        timing = dict()
+        timing = []
         for query in queries:
             query_terms = self.search.processQueryTerms(query)
             prev_time = time.time()
@@ -18,14 +27,30 @@ class Timing():
             if use_pagerank:
                 pageranks = dict(ranking.db.get_pageranks())
                 results = self.search.add_pageranks(pageranks, results)
-            timing[query] = time.time() - prev_time
+            timing.append(time.time() - prev_time)
+            print time.time()-prev_time
         return timing
 
+    def produce_average(self, times):
+        sum = 0
+        for i in times:
+            sum = sum + i
+        return sum/len(times)
+
 if __name__ == "__main__":
-    queries = ["jun wang", "degree", "moodle", "alphago", "information retrieval and data mining", "computer graphics syllabus"]
-    rankings = [BM25Ranking(), TFIDFRanking(), QueryLikelihoodRanking()]
+    queries = ["jun wang", "degree", "moodle", "alphago", "information retrieval and data mining", "computer graphics syllabus", "ai research", "new research", "emine yilmaz", "computational complexity"]
     timing = Timing()
-    use_pagerank = True
+    rankings = [BM25Ranking(), TFIDFRanking(), QueryLikelihoodRanking()]
+    use_pagerank = False
     for ranking in rankings:
-        print ranking.__class__.__name__
-        print timing.produce_time(queries, ranking, use_pagerank)
+        name = ranking.__class__.__name__
+        print name
+        times =  timing.produce_time(queries, ranking, use_pagerank)
+        avg = timing.produce_average(times)
+        print avg
+        item = (name,avg)
+        if use_pagerank:
+            timing.write_csv(item, "./results/time/timing_" + "PR.csv", 'a')
+        else:
+            timing.write_csv(item, "./results/time/timing" + ".csv", 'a')
+

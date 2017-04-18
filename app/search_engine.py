@@ -57,8 +57,8 @@ class SearchEngine():
                 top_pages.append(item)
         return top_pages
 
-    def write_csv(self, results, filename):
-        csvfile = open(filename, 'w')
+    def write_csv(self, results, filename, perm):
+        csvfile = open(filename, perm)
         wr = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_ALL)
         data = []
         for result in results:
@@ -139,6 +139,6 @@ if __name__ == "__main__":
             print "\t" + search.cleanTitle(match[0]) + "\n\t\t"+ match[1]
 
         if use_pagerank:
-            search.write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_PR_" + query_terms[0]+ ".csv"))
+            search.write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_PR_" + query_terms[0]+ ".csv"), 'w')
         else:
-            search.write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_" + query_terms[0]+ ".csv"))
+            search.write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_" + query_terms[0]+ ".csv"), 'w')
