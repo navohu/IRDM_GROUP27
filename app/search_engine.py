@@ -120,7 +120,7 @@ if __name__ == "__main__":
         for match in matches:
             print "\t" + cleanTitle(match[0]) + "\n\t\t"+ match[1]
 
-        if pagerank == "Y" or "yes" or "y":
+        if pagerank == "Y" or pagerank == "yes" or pagerank == "y":
             write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_PR_" + query_terms[0]+ ".csv"))
         else:
             write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_" + query_terms[0]+ ".csv"))
