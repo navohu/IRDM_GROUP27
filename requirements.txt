@@ -1,3 +1,5 @@
+numpy
+scipy
 bs4==0.0.1
 html2text==2016.9.19
 networkx==1.11
