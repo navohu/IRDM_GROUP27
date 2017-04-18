@@ -11,6 +11,8 @@ class TFIDFRanking(Ranking):
     def TF_IDF(self, term, freq, docid, num_docs, term_freq_coll, doc_lengths, word_occs):
         tf = float(word_occs) / float(doc_lengths)
         idf = log(float(num_docs) / float(term_freq_coll)) / log(2)
+        if idf <= 0:
+            idf = 0.001
         return tf*idf
 
     def cosine_similarity(vector1, vector2):

@@ -74,7 +74,7 @@ Based on these URLs, an inverted index is created, consisting of a dictionary th
 
 The crawling was done through an open source platform called Scrapy\footnote{https://scrapy.org} written in Python. This platform would be given a start-url "\url{www.cs.ucl.ac.uk}", followed by a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. So "\url{www.cs.ucl.ac.uk/home}" would be accepted, just like "\url{www.wiki.cs.ucl.ac.uk}". We set a max-depth of the crawler because we realised throughout the crawling that some links were extremely long with unnecessary indexing information of the CS website.
 
-The elements that were crawled from the website was the urls, titles ($<$h1$>$ tags) of page and the anchor text. Each instance would also be associated with a unique identifier. Let's call this table \emph{cs\_sites}. The reason why we didn't crawl the content of the pages to store in the database was because of storage reasons. As long as we have all the links of the whole domain in the database it is easy to access the content of the page at a later point.
+The elements that were crawled from the website was the urls, titles ($<$h1$>$ tags) of page and the anchor text. Each instance would also be associated with a unique identifier. This information was stored in the table \emph{cs\_sites}. The reason why we didn't crawl the content of the pages to store in the database was because of storage reasons. As long as we have all the links of the whole domain in the database it is easy to access the content of the page at a later point.
 
 % subsubsection crawling (end)
 
@@ -88,9 +88,9 @@ Explain the columns that were added to the cs\_sites table
 \subsubsection{PageRank} % (fold)
 \label{ssub:pagerank}
 
-The popular algorithm PageRank\footnote{https://en.wikipedia.org/wiki/PageRank} is an algorithm developed by Google for ranking the results within a search engine. It is also commonly used for measuring the importance of a website. The algorithm is based on an assumption that more important websites are more likely to be pointed to from other websites.
+The popular algorithm PageRank\footnote{https://en.wikipedia.org/wiki/PageRank} was developed by Google for ranking the results within a search engine. It is also commonly used for measuring the importance of a website. The algorithm is based on an assumption that more important websites are more likely to be pointed to from other websites.
 
-The algorithm implies that it would need a way of representing connections between web sites. This can easily be done with the aid of an adjacency matrix. Firstly, all the connections needed to be measured, which was done by obtaining all the outgoing links for each site in \emph{cs\_sites}. Now, each link would point to a certain number of outgoing links disregarding whether they were in the \emph{cs.ucl.ac.uk} domain or not. From these connection an adjacency matrix was produces as shown as an example in Table \ref{fig:adj_mx}. 
+The algorithm implies that it would need a way of representing connections between web sites. This can easily be done with the aid of an adjacency matrix. Firstly, all the connections needed to be measured, which was done by obtaining all the outgoing links for each site in \emph{cs\_sites}. Now, each link would point to a certain number of outgoing links disregarding whether they were in the \emph{cs.ucl.ac.uk} domain or not, but were filtered to eventually only hold links within the CS domain. From these connections an adjacency matrix was produced as shown as an example in Table \ref{fig:adj_mx}. 
 
 \begin{table}[!h]
   \centering
@@ -113,7 +113,7 @@ $$ r_i = r_{i-1} \cdot (I_i *s + S_i * s + T_i * (1-s)) $$
 
 where \emph{r} is the PageRank, \emph{$I_i$} is the inlinks of state \emph{i}, \emph{$S_i$} are the sink states, \emph{$T_i$} is the teleporting state and \emph{s} is the probabillity of following a transitions. That means that \emph{s-1} is the probability of teleporting. We have set $s=.85$. The algorithm will continue to calculate \emph{$r_i$} until it reaches a value below the maxerr rate ($maxerr = 0.001$). It is then said to be converged. 
 
-The PageRank is then used in our search engine to rank the difference between similar documents. If two documents showed to have very similar ranks produced, the PageRank can be a useful metric that can give an extra weight to each ranked document. It will then be clearer which documents are more appropriate and most likely more visited. 
+The PageRank is then used in our search engine to rank the differences between similar documents. If two documents showed to have very similar ranks produced, the PageRank weighting can be a useful metric that can give an extra weight to each ranked document. It will then be clearer which documents are more appropriate and most likely more visited. 
 
 
 % subsubsection pagerank (end)
@@ -132,18 +132,18 @@ $$TF = \frac{f_{t,d}}{\sum\limits_{t' \in d} f_{t,d}}$$
 
 $$IDF = log_2 \frac{N}{n_t}$$
 
-where $f_{t,d}$ is the number of term occurrences within a document, while the summation is the length of the document. \emph{N} is the number of documents in collection and $n_t$ is the term frequency in the collection. The documents would then be ranked based on the product of $TF * IDF$ and will display all the documents in order. 
+where $f_{t,d}$ is the number of term occurrences within a document (TF), while the summation is the length of the document. \emph{N} is the number of documents in collection and $n_t$ is the term frequency in the collection. An important notice is that if a term is appearing in more than half of the corpus documents, the IDF would become negative and impossible to interpret against other positive documents. As a result of this drawback we decided to turn all negative values into a small value like $\alpha = 0.001$ in order for the app to compare all the results against each other. All of these terms were retrieved from our database. The documents would then be ranked based on the product of $TF * IDF$ and will display all the documents in descending order. 
 
 % subsection tf_idf (end)
 
 \subsubsection{BM25} % (fold)
 \label{ssub:BM25}
 
-BM25 is another type of ranking algorithm developed by Karen Spärck Jones. It is a newer and improved version of TF-IDF. The BM25 belongs to the probabilistic models and uses the "bag of words" concept for retrieving relevant documents from a given search query. The formula to adjust the TF score based on the document length is as below where b and k are constants and L is the length of document:
+BM25 is another type of ranking algorithm developed by Karen Sparck Jones. It is a newer and improved version of TF-IDF. The BM25 belongs to the probabilistic models and uses the "bag of words" concept for retrieving relevant documents from a given search query. The difference from TF-IDF is how BM25 treats the "TF" term. It adjusts the TF score by The formula to adjust the TF score based on the document length is as below where b and k are constants and L is the length of document:
 
 $$ score(D, Q) = \sum_{i=1}^n IDF(q_i) * \frac{f(q_i, D)* (k + 1)}{f(q_i, D) + k * (1-b + b * \frac{|D|}{avgdl})}$$
 
-where the IDF is defined as in subsection \ref{sub:tf_idf}.
+where the IDF is defined as in subsection \ref{sub:tf_idf}. The same issue with the IDF term turning negative if a term is present in more than half of the document collection also occur for BM25. Hence, the adjustment of setting the IDF term to a small value was also implemented here.
 
 % subsubsection BM25 (end)
 
