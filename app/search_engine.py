@@ -47,7 +47,8 @@ def get_top_docs(results, max_results, rank):
     for result in top_results:
         page_id = result[0]
         relevance = result[1]
-        if relevance > 0:
+        # BM25 can give negative rankings
+        if relevance > 0 or isinstance(rank, BM25Ranking):
             url = urls[page_id]
             title = titles[page_id]
             #print (page[0], page[1])
@@ -131,7 +132,6 @@ if __name__ == "__main__":
         if use_pagerank:
             results = add_pageranks(pageranks, results)
         print 'Time to rank', time.time() - prev_time
-
         #prev_time = time.time()
         matches = get_top_docs(results, max_results, ranking)
         #matches = deal_with_boolean(results)
