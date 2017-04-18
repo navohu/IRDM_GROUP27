@@ -38,7 +38,7 @@ Many of these algorithm are commonly used in web search today and the rest of th
 % section related_work (end)
 
 
-\section{Experiment} % (fold)
+\section{Experiments} % (fold)
 \label{sec:experiment}
 
 This section will present the overall methodology of building a search engine. Our methodology is freely and easily adaptable since it uses open source Python libraries and free-tier instances of Amazon Web Services Elastic Compute Cloud (EC2) and Relational Database Service (RDS). There are five main algorithms that have been implemented and contrasted in this project: Boolean Retrieval, TF-IDF, BM25, query likelihood estimation and PageRank. The assortment of algorithms was chosen after a thorough examination of the current literature in the field. We wanted to both test algorithms that have been shown to be very accurate and include some that are less advanced in order to provide a full overview of the the most known algorithms in the field, and cover the main differences between them. 
@@ -52,9 +52,9 @@ The test set was manually created in order for us to evaluate the performance of
 
 % subsection dataset_description (end)
 
-\subsection{Methods} % (fold)
+\subsection{Indexing} % (fold)
 \label{sub:methods}
-The methodology includes a wide range of steps and exploration in order to build our search engine. These will be presented here.
+A well-designed index is central to search engine performance. Before we could experiment with ranking algorithms, we had to set up cloud computing infrastructure for our index database, define the search domain to crawl, design a database schema and populate it with indexed data. The design decisions we made in the process are highlighted below. %The methodology includes a wide range of steps and exploration in order to build our search engine. These will be presented here.
 
 \subsubsection{AWS Database \& Server Setup} % (fold)
 \label{ssub:database_and_server_setup}
@@ -72,18 +72,26 @@ Based on these URLs, an inverted index is created, consisting of a dictionary th
 \subsubsection{Crawling} % (fold)
 \label{ssub:crawling}
 
-The crawling was done through an open source platform called Scrapy\footnote{https://scrapy.org} written in Python. This platform would be given a start-url "\url{www.cs.ucl.ac.uk}", followed by a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. So "\url{www.cs.ucl.ac.uk/home}" would be accepted, just like "\url{www.wiki.cs.ucl.ac.uk}". We set a max-depth of the crawler because we realised throughout the crawling that some links were extremely long with unnecessary indexing information of the CS website.
+The crawling was done through an open source platform called Scrapy\footnote{https://scrapy.org} written in Python. This platform is given a start URL "\url{www.cs.ucl.ac.uk}", followed by a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. This would include pages such as "\url{www.cs.ucl.ac.uk/home}", and "\url{www.wiki.cs.ucl.ac.uk}". We set a \emph{maximum depth} of the crawler because we found some links that were extremely long only contained parts of the internal index of the CS website practically never opened by visitors to the website.
 
-The elements that were crawled from the website was the urls, titles ($<$h1$>$ tags) of page and the anchor text. Each instance would also be associated with a unique identifier. This information was stored in the table \emph{cs\_sites}. The reason why we didn't crawl the content of the pages to store in the database was because of storage reasons. As long as we have all the links of the whole domain in the database it is easy to access the content of the page at a later point.
+The elements that were crawled from the website were the urls, titles ($<$h1$>$ tags) and the anchor text. This information, along with a unique identifier, was stored in the table \emph{cs\_sites}. We didn't crawl and store the content of the pages because of storage limitations. As long as all links of the domain are contained in the database, it is easy to access the content of each page at the indexing stage.
 
 % subsubsection crawling (end)
 
 \subsubsection{Inverted Index} % (fold)
 \label{ssub:inverted_index}
 
-Explain the columns that were added to the cs\_sites table
+To map each word to the IDs of documents it appears in, and then reduce that set of pairs by counting the frequency of each pair, we used Apache Spark, an open-source big data processing framework based on the MapReduce paradigm. In this way, we were able to parallelise the computation-heavy task of retrieving the content of each website, pre-processing its terms and aggregating the results before writing them to the database. We ran Spark on the EC2 server as well as on an Elastic MapReduce cluster with two worker nodes for increased throughput.
+
+%Explain the columns that were added to the cs\_sites table
 
 % subsubsection inverted_index (end)
+
+\subsection{Ranking algorithms}
+\label{sub:ranking}
+
+The ranking algorithms we applied on the inverted index can roughly be divided into two categories: standalone rankers and query-insensitive supplementary metrics. In the standalone category, we implemented Boolean retrieval, TF-IDF, BM25 and Query Likelihood ranking. In addition, we added an option to include PageRank scoring to augment the ranking of each of the former algorithms. PageRank itself belongs to the latter supplementary category, since it can not be directly used to retrieve results for a query, as it does not take query terms into consideration and depends on page features only.
+
 
 \subsubsection{PageRank} % (fold)
 \label{ssub:pagerank}
@@ -157,7 +165,7 @@ All of these algorithms could be run within our app by choosing a parameter when
 
 % subsection methods (end)
 
-\subsection{Metrics \& Analysis} % (fold)
+\subsection{Evaluation Metrics} % (fold)
 \label{sub:metrics_&_analysis}
 
 The evaluation is an important step to measure performance and will show whether the results of the algorithms conform with expected values. The most common metrics in evaluation within information retrieval is precision, recall and the F1 score. These three are the main evaluation algorithms used within this project. The evaluation is performed on all the ranking algorithms: Boolean retrieval, TF-IDF, BM25 and query likelihood. They are then evaluated in the case of using PageRank and the case without PageRank.
