@@ -18,7 +18,7 @@ class QueryLikelihoodRanking(Ranking):
 		lambdaRatio = 0.8
 		for term in query_terms:
 			word_occs[term] = dict(self.db.get_word_occs(term))
-			print term, 'appears in ', len(word_occs[term]), 'documents'
+			#print term, 'appears in ', len(word_occs[term]), 'documents'
 			bg_prob[term] = float(self.db.get_term_freq_collection(term)) / self.words_in_collection
 		for doc_id in self.doc_lengths:
 			doc_length = self.doc_lengths[doc_id]

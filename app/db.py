@@ -37,6 +37,16 @@ class MyDB():
         else:
             return site
 
+    def get_site_links(self, site_ids):
+        self.query("""SELECT id, link FROM %(sites)s WHERE id = ANY(%(ids)s)""",
+                   params={"sites": AsIs(self.sites), "ids": site_ids})
+        return self.fetchall()
+
+    def get_site_titles(self, site_ids):
+        self.query("""SELECT id, title FROM %(sites)s WHERE id = ANY(%(ids)s)""",
+                   params={"sites": AsIs(self.sites), "ids": site_ids})
+        return self.fetchall()
+
     def get_doc_lengths(self):
         self.query("""SELECT id, stemmed_length FROM %(sites)s""",
                    params={"sites": AsIs(self.sites)})
@@ -84,6 +94,11 @@ class MyDB():
         self.query("""SELECT pagerank FROM %(sites)s WHERE id = %(doc_id)s""",
                 params={"sites": AsIs(self.sites), "doc_id": doc_id})
         return self.cur.fetchone()[0]
+
+    def get_pageranks(self):
+        self.query("""SELECT id, pagerank FROM %(sites)s WHERE pagerank IS NOT NULL""",
+                   params={"sites": AsIs(self.sites)})
+        return self.fetchall()
 
 
 if __name__ == "__main__":
