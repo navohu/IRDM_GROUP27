@@ -63,11 +63,12 @@ def deal_with_boolean(results):
     return matches
 
 def get_rank(x):
-    return {
-        '1': TFIDFRanking(),
-        '2': BM25Ranking(),
-        '3': QueryLikelihoodRanking(),
-    }.get(x, TFIDFRanking())
+    if x == 1:
+        return TFIDFRanking()
+    elif x == 2:
+        return BM25Ranking()
+    else:
+        return QueryLikelihoodRanking()
 
 def pagerank_contrib(results):
     # get doc_id of certain result
