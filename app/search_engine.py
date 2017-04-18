@@ -38,15 +38,20 @@ def cleanTitle(title):
     return title
 
 def get_top_docs(results, max_results, rank):
-    #rank = Ranking()
     top_results = sorted(results.iteritems(), key=operator.itemgetter(1), reverse=True)[:max_results]
+    site_ids = [result[0] for result in top_results]
     top_pages = []
+    urls = dict(rank.db.get_site_links(site_ids))
+    titles = dict(rank.db.get_site_titles(site_ids))
+
     for result in top_results:
-        if result[1] > 0:
-            page = rank.db.get_site_by_id(result[0])
-            title = rank.db
+        page_id = result[0]
+        relevance = result[1]
+        if relevance > 0:
+            url = urls[page_id]
+            title = titles[page_id]
             #print (page[0], page[1])
-            item = (page[0], page[1])
+            item = (title, url)
             top_pages.append(item)
     return top_pages
 
@@ -76,7 +81,6 @@ def get_rank(x):
 def pagerank_contrib(results, rank):
     # get doc_id of certain result
     # multiply that doc_id with the pagerank of that doc_id
-    #rank = Ranking()
     sorted_results = sorted(results.iteritems(), key=operator.itemgetter(1), reverse=True)
     PR_result = dict()
     for result in sorted_results:
@@ -88,39 +92,56 @@ def pagerank_contrib(results, rank):
         PR_result[result[0]] = item
     return PR_result
 
+def add_pageranks(pageranks, results):
+    PR_results = results
+    for result in results.iteritems():
+        page_id = result[0]
+        relevance = result[1]
+        if page_id in pageranks and pageranks[page_id] is not None:
+            PR_results[page_id] = relevance * float(pageranks[page_id])
+    return PR_results
+
 if __name__ == "__main__":
     max_results = 30
+    max_printed = 10
     raw_ranking = raw_input("""Select the ranking algorithm you want to use: 
                             \n (1) TFIDF
                             \n (2) BM25
                             \n (3) Query Likelihood
                             \n
                             \n Enter number here: """)
-    prevTime = time.time()
+    prev_time = time.time()
     ranking = get_rank(raw_ranking)
-    print 'Time to init', time.time() - prevTime
+    print 'Time to init', time.time() - prev_time
     pagerank = raw_input("Do you want it with PageRank? Y/N \n")
+
+    if pagerank == "Y" or pagerank == "yes" or pagerank == "y":
+        use_pagerank = True
+        pageranks = dict(ranking.db.get_pageranks())
+    else:
+        use_pagerank = False
 
     while True:
         raw_query_terms = raw_input("Enter a search query: ")
         query_terms = processQueryTerms(raw_query_terms)
         print "Searching for ", query_terms
 
-        prevTime = time.time()
+        prev_time = time.time()
         results = ranking.rankDocuments(query_terms)
-        print 'Time to rank', time.time() - prevTime
+        if use_pagerank:
+            results = add_pageranks(pageranks, results)
+        print 'Time to rank', time.time() - prev_time
 
-        if pagerank == "Y" or pagerank == "yes" or pagerank == "y":
-            results = pagerank_contrib(results, ranking)
-
+        #prev_time = time.time()
         matches = get_top_docs(results, max_results, ranking)
         #matches = deal_with_boolean(results)
+        #print 'Time to fetch urls', time.time() - prev_time
 
         print ("Results")
-        for match in matches:
+        for match in matches[:max_printed]:
             print "\t" + cleanTitle(match[0]) + "\n\t\t"+ match[1]
 
-        if pagerank == "Y" or "yes" or "y":
+        if use_pagerank:
             write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_PR_" + query_terms[0]+ ".csv"))
         else:
             write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_" + query_terms[0]+ ".csv"))
