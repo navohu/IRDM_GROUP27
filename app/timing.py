@@ -8,7 +8,10 @@ from app.TFIDF.tf_idf import TFIDFRanking
 
 class Timing():
     def __init__(self):
-        self.search = SearchEngine()
+        self.search = None
+
+    def set_search_engine(self, search_engine):
+        self.search = search_engine
 
     def write_csv(self, results, filename, perm):
         csvfile = open(filename, perm)
@@ -43,6 +46,7 @@ if __name__ == "__main__":
     rankings = [BM25Ranking(), TFIDFRanking(), QueryLikelihoodRanking()]
     use_pagerank = False
     for ranking in rankings:
+        timing.set_search_engine(SearchEngine(ranking))
         name = ranking.__class__.__name__
         print name
         times =  timing.produce_time(queries, ranking, use_pagerank)

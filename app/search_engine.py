@@ -13,6 +13,8 @@ from app.TFIDF.tf_idf import TFIDFRanking
 import time
 
 class SearchEngine():
+    def __init__(self, ranking=None):
+        self.ranking = ranking
 
     def processQueryTerms(self, query_terms):
         stop = set(stopwords.words('english'))
@@ -39,12 +41,12 @@ class SearchEngine():
             title = title[1:len(title)-1]
         return title
 
-    def get_top_docs(self, results, max_results, rank):
+    def get_top_docs(self, results, max_results):
         top_results = sorted(results.iteritems(), key=operator.itemgetter(1), reverse=True)[:max_results]
         site_ids = [result[0] for result in top_results]
         top_pages = []
-        urls = dict(rank.db.get_site_links(site_ids))
-        titles = dict(rank.db.get_site_titles(site_ids))
+        urls = dict(self.ranking.db.get_site_links(site_ids))
+        titles = dict(self.ranking.db.get_site_titles(site_ids))
 
         for result in top_results:
             page_id = result[0]
@@ -71,22 +73,22 @@ class SearchEngine():
             matches.append(result[1])
         return matches
 
-    def get_rank(self, x):
+    def set_rank(self, x):
         x = int(x)
         if x == 1:
-            return TFIDFRanking()
+            self.ranking = TFIDFRanking()
         elif x == 2:
-            return BM25Ranking()
+            self.ranking = BM25Ranking()
         else:
-            return QueryLikelihoodRanking()
+            self.ranking = QueryLikelihoodRanking()
 
-    def pagerank_contrib(self, results, rank):
+    def pagerank_contrib(self, results):
         # get doc_id of certain result
         # multiply that doc_id with the pagerank of that doc_id
         sorted_results = sorted(results.iteritems(), key=operator.itemgetter(1), reverse=True)
         PR_result = dict()
         for result in sorted_results:
-            pagerank = rank.db.get_pagerank(result[0])
+            pagerank = self.ranking.db.get_pagerank(result[0])
             if pagerank is None:
                 item = result[1]
             else:
@@ -106,6 +108,7 @@ class SearchEngine():
 if __name__ == "__main__":
     max_results = 30
     max_printed = 10
+    save_results = True
     raw_ranking = raw_input("""Select the ranking algorithm you want to use: 
                             \n (1) TFIDF
                             \n (2) BM25
@@ -113,12 +116,12 @@ if __name__ == "__main__":
                             \n
                             \n Enter number here: """)
     search = SearchEngine()
-    ranking = search.get_rank(raw_ranking)
+    search.set_rank(raw_ranking)
     pagerank = raw_input("Do you want it with PageRank? Y/N \n")
 
     if pagerank == "Y" or pagerank == "yes" or pagerank == "y":
         use_pagerank = True
-        pageranks = dict(ranking.db.get_pageranks())
+        pageranks = dict(search.ranking.db.get_pageranks())
     else:
         use_pagerank = False
 
@@ -127,10 +130,10 @@ if __name__ == "__main__":
         query_terms = search.processQueryTerms(raw_query_terms)
         print "Searching for ", query_terms
 
-        results = ranking.rankDocuments(query_terms)
+        results = search.ranking.rankDocuments(query_terms)
         if use_pagerank:
             results = search.add_pageranks(pageranks, results)
-        matches = search.get_top_docs(results, max_results, ranking)
+        matches = search.get_top_docs(results, max_results)
         #matches = deal_with_boolean(results)
         #print 'Time to fetch urls', time.time() - prev_time
 
@@ -138,7 +141,7 @@ if __name__ == "__main__":
         for match in matches[:max_printed]:
             print "\t" + search.cleanTitle(match[0]) + "\n\t\t"+ match[1]
 
-        if use_pagerank:
-            search.write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_PR_" + query_terms[0]+ ".csv"), 'w')
+        if use_pagerank and save_results:
+            search.write_csv(matches, ("./results/" + search.ranking.__class__.__name__ + "_PR_" + query_terms[0]+ ".csv"), 'w')
         else:
-            search.write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_" + query_terms[0]+ ".csv"), 'w')
+            search.write_csv(matches, ("./results/" + search.ranking.__class__.__name__ + "_" + query_terms[0]+ ".csv"), 'w')
