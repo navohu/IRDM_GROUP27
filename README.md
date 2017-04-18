@@ -4,11 +4,16 @@
 
 ### How to run
 ##### Add database credentials
-Create a `.pgpass` file in your home directory with the following contents: `<hostname>:<port>:<database>:<username>:<password>`
+Create a `.pgpass` file in your home directory of your computer with the following contents: 
+`<hostname>:<port>:<database>:<username>:<password>`
+
+followed by modifying access permission of the file:
+`chmod 600 ~/.pgpass`
 
 ##### Install all requirements
 ~~~~
-pip install -r requirements
+python -m pip install --upgrade pip
+pip install -r requirements.txt
 ~~~~
 
 ##### Run the search engine
