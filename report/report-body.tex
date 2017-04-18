@@ -161,7 +161,7 @@ $$TF = \frac{f_{t,d}}{\sum\limits_{t' \in d} f_{t,d}}$$
 
 $$IDF = log_2 \frac{N}{n_t}$$
 
-where $f_{t,d}$ is the number of term occurrences within a document (TF), while the summation is the length of the document. \emph{N} is the number of documents in collection and $n_t$ is the term frequency in the collection. All of these terms were retrieved from our database. The documents would then be ranked based on the product of $TF * IDF$ and will display all the documents in descending order. 
+where $f_{t,d}$ is the number of term occurrences within a document (TF), while the summation is the length of the document. \emph{N} is the number of documents in collection and $n_t$ is the term frequency in the collection. An important notice is that if a term is appearing in more than half of the corpus documents, the IDF would become negative and impossible to interpret against other positive documents. As a result of this drawback we decided to turn all negative values into a small value like $\alpha = 0.001$ in order for the app to compare all the results against each other. All of these terms were retrieved from our database. The documents would then be ranked based on the product of $TF * IDF$ and will display all the documents in descending order. 
 
 % subsection tf_idf (end)
 
@@ -172,7 +172,7 @@ BM25 is another type of ranking algorithm developed by Karen Sparck Jones. It is
 
 $$ score(D, Q) = \sum_{i=1}^n IDF(q_i) * \frac{f(q_i, D)* (k + 1)}{f(q_i, D) + k * (1-b + b * \frac{|D|}{avgdl})}$$
 
-where the IDF is defined as in subsection \ref{sub:tf_idf}.
+where the IDF is defined as in subsection \ref{sub:tf_idf}. The same issue with the IDF term turning negative if a term is present in more than half of the document collection also occur for BM25. Hence, the adjustment of setting the IDF term to a small value was also implemented here.
 
 % subsubsection BM25 (end)
 
