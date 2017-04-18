@@ -131,7 +131,6 @@ if __name__ == "__main__":
         if use_pagerank:
             results = add_pageranks(pageranks, results)
         print 'Time to rank', time.time() - prev_time
-
         #prev_time = time.time()
         matches = get_top_docs(results, max_results, ranking)
         #matches = deal_with_boolean(results)
