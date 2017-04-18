@@ -42,16 +42,19 @@ def get_top_docs(results, max_results):
     for result in top_results:
         if result[1] > 0:
             page = rank.db.get_site_by_id(result[0])
-            # print (page[1], result[1])
-            top_pages.append(page[1])
+            title = rank.db
+            #print (page[0], page[1])
+            item = (page[0], page[1])
+            top_pages.append(item)
     return top_pages
 
 def write_csv(results, filename):
     csvfile = open(filename, 'w')
     wr = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_ALL)
-    
-    #for row in results:    
-    wr.writerow(results)
+    data = []
+    for result in results:
+        data.append(result[1]) 
+    wr.writerow(data)
 
 def deal_with_boolean(results):
     matches = []
@@ -59,23 +62,56 @@ def deal_with_boolean(results):
         matches.append(result[1])
     return matches
 
+def get_rank(x):
+    return {
+        '1': TFIDFRanking(),
+        '2': BM25Ranking(),
+        '3': QueryLikelihoodRanking(),
+    }.get(x, TFIDFRanking())
+
+def pagerank_contrib(results):
+    # get doc_id of certain result
+    # multiply that doc_id with the pagerank of that doc_id
+    rank = Ranking()
+    sorted_results = sorted(results.iteritems(), key=operator.itemgetter(1), reverse=True)
+    PR_result = dict()
+    for result in sorted_results:
+        pagerank = rank.db.get_pagerank(result[0])
+        if pagerank is None:
+            item = result[1]
+        else:
+            item = result[1] * float(pagerank)
+        PR_result[result[0]] = item
+    return PR_result
+
 if __name__ == "__main__":
     max_results = 30
-    ranking = QueryLikelihoodRanking()
-    #ranking = BM25Ranking()
-    #ranking = TFIDFRanking()
     #ranking = BooleanRanking()
     while True:
+        raw_ranking = raw_input("""Select the ranking algorithm you want to use: 
+                \n (1) TFIDF
+                \n (2) BM25
+                \n (3) Query Likelihood
+                \n
+                \n Enter number here: """)
+        ranking = get_rank(raw_ranking)
+        pagerank = raw_input("Do you want it with PageRank? Y/N \n")
+
         raw_query_terms = raw_input("Enter a search query: ")
         query_terms = processQueryTerms(raw_query_terms)
 
         print "Searching for ", query_terms
         results = ranking.rankDocuments(query_terms)
+        if pagerank == "Y" or "yes" or "y":
+            results = pagerank_contrib(results)
         matches = get_top_docs(results, max_results)
         #matches = deal_with_boolean(results)
-        print matches
-        write_csv(matches, ("./results/QueryLikelihoodRanking_" + query_terms[0]+ ".csv"))
+        # print matches
+        if pagerank == "Y" or "yes" or "y":
+            write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_PR_" + query_terms[0]+ ".csv"))
+        else:
+            write_csv(matches, ("./results/" + ranking.__class__.__name__ + "_" + query_terms[0]+ ".csv"))
 
-        #print ("Results")
-        #for match in matches:
-         #       print ("\t", cleanTitle(match[0]), "\n\t\t", match[1])
+        print ("Results")
+        for match in matches:
+            print "\t" + cleanTitle(match[0]) + "\n\t\t"+ match[1]

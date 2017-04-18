@@ -1,6 +1,16 @@
 \section{Introduction}
 
-TODO:
+At the late end of the 20th century a need of quickly obtain information on the World Wide Web developed. As a result of this, search engines were developed and are one of the most common methods to find information online today. Competition between the different search engines has been present since the start, but Google has clearly ruled the market. It's name has been famous because of its algorithms that have outperformed the other search engines. Not all of the algorithms that the Google search engine is using are known. Those who are known have been present through decades, such as TF-IDF, BM25, PageRank and query likelihood ranking.
+
+The aim of this report is to explore existing algorithms for information retrieval and how they perform against each other. The search engine was implemented on the "cs.ucl.ac.uk" domain and includes several preprocessing techniques and data transformations. The application includes implementations of several ranking algorithms and an evaluation of the results. The search engine application built for this project can be found on \url{github.com/navohu.......}and has been implemented in Python\footnote{All instructions for running the application can be found in the README file in the repository.}. Initially, our expectations for the project was to produce results that showed the difference of the current working algorithms, as well as an implementation of a deep learning algorithm. Since our project only included a search on the CS website it would imply that the amount of data might not be sufficient for a deep learning approach.
+
+
+
+TODO: Our results ... compare the different ranking algorithms with and without PageRank. Explain what metric showed the best results.
+
+
+This report will first explain different discoveries within the field of information retrieval, followed by an experiment section. This section will explore the methodology of how we created the search engine like setting up the database, programming the crawler and implementing the algorithms. Followed by the methodology section we will introduce the metrics we used in our evaluation, as well as defining which evaluation methods we would like to use. The results will finally be analysed and a discussion about the project and its limitations will be provided.
+
 
 \section{Related Work}
 Creating and ranking results in a search engine can be done through many different algorithms. This related work section will explore the literature covering two types of algorithms used for ranking the documents based on the query: probabilistic and non-probabilistic. Then we will investigate how to evaluate the results, based on a test set. Deep Learning is also a new topic that has caught attention, and will therefore be reviewed in terms of how it can be used in search engines.
@@ -27,6 +37,8 @@ Many of these algorithm are commonly used in web search today and the rest of th
 
 \section{Experiment} % (fold)
 \label{sec:experiment}
+
+This section will present the overall methodology of building a search engine. The whole methodology is freely and easily adaptable since it's using open source Python libraries and a free instance of an Amazon server. There are five main algorithms that have been implemented and compared against in this project: Boolean Retrieval, TFIDF, BM25, query likelihood estimation and PageRank. The assortment of algorithms were chosen by a thorough examination of the current literature in the field. We wanted to test algorithms that were known to be both very accurate and some that were less accurate in order to receive a full view of the the most known algorithms in the field, and the main differences between them. 
 
 \subsection{Dataset Description} % (fold)
 \label{sub:dataset_description}
@@ -176,6 +188,101 @@ All of these algorithms could be run within our app by choosing a parameter when
 \subsection{Metrics \& Analysis} % (fold)
 \label{sub:metrics_&_analysis}
 
+We conducted a series of evaluation tests on TF-IDF, Query Likelihood Ranking and BM25 to evaluate the performances of our search engine.
+\subsubsection{Queries}
+Commonly, there are three types of search query people type into the search box which are 'informational queries', 'navigational queries' and 'transaction queries'. 
+
+Informational queries are normally defined as 'Queries that cover a broad topic (e.g. colorado or trucks) for which there may be thousands of relevant results.' \cite{queries}. Those queries are normally used when  the user is looking for the information relate to the query rather than a specific website or transactional function. Therefore, more relevant documents are retrieved by the informational queries than the transactional and navigational queries. For the following tests, we would use 'jun wang' and 'degree' as the informational queries. The reason giving to queries is that 'jun wang' is more specific than 'degree', therefore we could compare the performances of engines with specific and general queries.
+
+Navigational queries are frequently used when someone is trying to find a certain website or portal. For example, a user might enter 'Facebook' into the search bar to find the Facebook website rather than directly entering the url into the browser's navigational bar. Therefore, the navigational results should be ranked on the top for this kinds of queries. However, some queries that seem to be navigational in nature but might be not. For example, users who search for 'facebook' might actually be looking for news of facebook. We decided to use 'moodle' to represent this kind of queries.
+
+A Transactional query shows an intend to complete a transaction, e.g. Making a purchase or paying fees. We skipped this query since there are too few transactional links under cs.ucl.ac.uk domain. 
+
+\subsubsection{Recall, Precision and F1}
+Recall, precision and F1 score are the most popular metrics to evaluate the performance of a search engine. 
+
+Recall is the ratio of the number of relevant documents retrieved by the search engine to the number of total relevant document in the database. The formula is shown as below: 
+\[recall=\frac{\mid relevant documents\cap retrieved documents\mid}{\mid relevant documents \mid}\]
+
+However, it does not make sense to pursue 100\% recall by returning all documents in response to every query, therefore, recall alone is not enough but one needs to measure the non-relevant document retrieved. Precision is a good supplementary metric. It measures the ratio of the number of relevant  documents retrieved to the total number of document retrieved by the search engine. The formula for precision is shown as below:
+\[precision=\frac{\mid relevant documents\cap retrieved documents\mid}{\mid retrieved documents \mid}\]
+
+F1 score is a good measure of accuracy of the result of the given search engine. It considers both precision and recall of the test to compute the score. The general formula is F1 score is as follow:
+\[F1=(1+\beta^{2})\cdot \frac{precision\cdot recall}{(\beta^{2}\cdot precision)+recall}\]
+
+In our experiment, we would set the parameter to be the traditional value 0.5, and therefore the formula would be:
+
+\[F1=2\cdot \frac{precision \cdot recall}{precision+recall}\]
+The following tables indicate the results of precision, recall and F1 score of tests on queries 'degree', 'jun wang' and 'moodle' respectively. There are totally 68, 10 and 2 relevant documents in the queries of 'degree', 'jun wang' and 'moodle' test pools. 
+
+It can be seen that the BM25 has the best performance on both precision and recall among all three algorithms. This could because that the penalty on term frequency and document length that BM25 implements helps to avoid retrieving non-relevant documents. Also, it strikes to the eyes that specific query 'jun wang' gives higher recall while lower precision performance than the general query 'degree'. This could because the specificity of the query restricts the total number of relevant documents and therefore search engines would be easier to retrieve most of those documents. However, a general query allows more documents to be relevant, and hence the precision would be higher. 
+
+For the query 'moodle', since its nature of being navigational, there should be only a few relevant results corresponding to it. Therefore, the recall of the performances of all engines is high although the precision is low since engines will start to give less relevant results once all highly relevant results have been retrieved.
+
+\begin{table}[]
+\centering
+\caption{query 'degree'}
+\label{my-label}
+\begin{tabular}{|l|l|l|l|}
+\hline
+          & BM25  & QueryLikelihood & TF-IDF \\ \hline
+Precision & 0.80  & 0.733           & 0.733  \\ \hline
+Recall    & 0.369 & 0.338           & 0.338  \\ \hline
+F1 score  & 0.505 & 0.463           & 0.463  \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[]
+\centering
+\caption{query 'jun wang'}
+\label{my-label}
+\begin{tabular}{|l|l|l|l|}
+\hline
+          & BM25  & QueryLikelihood & TF-IDF \\ \hline
+Precision & 0.333 & 0.233           & 0.267  \\ \hline
+Recall    & 1     & 0.70            & 0.8    \\ \hline
+F1 score  & 0.5   & 0.35            & 0.40   \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[]
+\centering
+\caption{query 'moodle'}
+\label{my-label}
+\begin{tabular}{|l|l|l|l|}
+\hline
+          & BM25 & QueryLikelihood & TF-IDF \\ \hline
+Precision & 0.4  & 0.4             & 0.4    \\ \hline
+Recall    & 1    & 1               & 1      \\ \hline
+F1 score  & 0.2  & 0.2             & 0.2    \\ \hline
+\end{tabular}
+\end{table}
+
+Graph \textbf{XYZ } show the plots of precision and recall of the performances of three queries respectively. It can be seen that BM25 could always retrieve more relevant documents than the other two algorithms which proves that the penalty  on term frequency and document length is very useful while determine the relevance of a document. Furthermore, the performances of Query Likelihood and TF-IDF are very close. Further tests on results ranking and DCG might give more detailed differences between performances between these two methods.
+
+Overall, the performance of the BM25 is the best considering all of the metrics of precision, recall and F1. 
+
+\subsubsection{Discounted Cumulative Gain( DCG)}
+
+DCG is a measure of ranking quality. It is used to evaluate the ranking of retrieved documents based on their position in the result list. The gain is accumulated from the top of the list to the bottom with the gain of each result discounted at lower ranks. The higher the DCG value is, the better the ranking is, and therefore more relevant documents are ranked on the top. The formula is as follow:
+
+\[DCG_{k}=\sum_1^k \frac{2^{rel_{i}}-1}{log_{2}(i+1)}\]
+We have carried out tests of three search terms with our three algorithms. Table \textbf{X} shows that BM25 has significantly better performance on search term $degree$ and $junwang$, while all three algorithms perform at the same level with search term $moodle$. We could interpret that BM25 is the best algorithm among those three, however, for search $moodle$, the amount of retrieved relevant URLs is too small to differentiate the performance of the algorithms. QueryLikehood outperforms TF-IDF on search term $degree$, by contrast, TF-IDF is the winner with search term $junwang$. Overall, those two algorithms deliver approximately the same level relevancy.
+
+
+\begin{table}[]
+\centering
+\caption{DCG of three queries}
+\label{my-label}
+\begin{tabular}{|l|l|l|l|}
+\hline
+        & BM25  & QueryLikelihood & TF-IDF \\ \hline
+degree  & 12.16 & 10.3            & 9.37   \\ \hline
+junwang & 7.25  & 6.3             & 6.6    \\ \hline
+moodle  & 4     & 4               & 4      \\ \hline
+\end{tabular}
+\end{table}
+
 This project's aim was to rank and compare already existing ranking algorithms. The evaluation is an important step to measure performance and will show expected results if the algorithms were implemented correctly. The most common metric in evaluation within information retrieval is precision and recall, which is one of the main evaluation algorithms used within this project. They are both inversely related which means that a high precision will normally give a lower recall and vice versa. They are defined as follows:
 
 $$precision = \frac{|relevant documents \cap retrieved documents|}{|retrieved documents|}$$
@@ -197,6 +304,8 @@ $$recall = \frac{|relevant documents \cap retrieved documents|}{|relevant docume
 Different type of implementation of TF-IDF and BM25, but we have only chosen some. 
 Limitations about the crawler - did it really get everything? Depth issue.
 
+Hard to show good differences when the test result was this small.
+
 % section discussion_&_limitations (end)
 
 \section{Conclusion} % (fold)
@@ -208,72 +317,5 @@ Limitations about the crawler - did it really get everything? Depth issue.
 \label{sec:references}
 
 % section references (end)
-
-
-% \begin{equation}
-%   \lim_{n\rightarrow \infty}x=0
-% \end{equation}
-% Notice how it is formatted somewhat differently in
-% the \textbf{displaymath}
-% environment.  Now, we'll enter an unnumbered equation:
-% \begin{displaymath}
-%   \sum_{i=0}^{\infty} x + 1
-% \end{displaymath}
-% and follow it with another numbered equation:
-% \begin{equation}
-%   \sum_{i=0}^{\infty}x_i=\int_{0}^{\pi+2} f
-% \end{equation}
-% just to demonstrate \LaTeX's able handling of numbering.
-
-
-% \begin{table}
-%   \caption{Frequency of Special Characters}
-%   \label{tab:freq}
-%   \begin{tabular}{ccl}
-%     \toprule
-%     Non-English or Math&Frequency&Comments\\
-%     \midrule
-%     \O & 1 in 1,000& For Swedish names\\
-%     $\pi$ & 1 in 5& Common in math\\
-%     \$ & 4 in 5 & Used in business\\
-%     $\Psi^2_1$ & 1 in 40,000& Unexplained usage\\
-%   \bottomrule
-% \end{tabular}
-% \end{table}
-
-
-% \begin{table*}
-%   \caption{Some Typical Commands}
-%   \label{tab:commands}
-%   \begin{tabular}{ccl}
-%     \toprule
-%     Command &A Number & Comments\\
-%     \midrule
-%     \texttt{{\char'134}author} & 100& Author \\
-%     \texttt{{\char'134}table}& 300 & For tables\\
-%     \texttt{{\char'134}table*}& 400& For wider tables\\
-%     \bottomrule
-%   \end{tabular}
-% \end{table*}
-% % end the environment with {table*}, NOTE not {table}!
-
-% Lists:
-% \begin{enumerate}
-% \item Never, ever use vertical rules.
-% \item Never use double rules.
-% \end{enumerate}
-% It is also a good idea not to overuse horizontal rules.
-
-% Figures
-%\begin{figure}
-%\includegraphics{fly}
-%\caption{A sample black and white graphic.}
-%\end{figure}
-%
-%\begin{figure}
-%\includegraphics[height=1in, width=1in]{fly}
-%\caption{A sample black and white graphic
-%that has been resized with the \texttt{includegraphics} command.}
-%\end{figure}
 
 
