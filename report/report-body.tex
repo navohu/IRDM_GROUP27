@@ -48,19 +48,26 @@ This section will present the overall methodology of building a search engine. O
 
 The search engine is dealing with two core datasets: the crawled web pages and the test set for evaluation. The crawled web pages are specifically modified and transformed for use. Examples of this include creating an inverted index based on the content of the crawled web pages or producing an adjacency matrix based on the relationship between pages.
 
-The test set was manually created in order for us to evaluate the performance of our search engine. Two main test sets were created: one for navigational use, and one for informational use. This means that one test set is specifically created such that the user want \emph{one} specific document (navigational), while the other test set is created to retrieve as many relevant documents as possible (informational). Both test sets included queries and relevant documents related to the queries (so that recall can be calculated). The composition of each test dataset is shown in the table below, to save space in the table, we replace information retrieval and data mining with IRDM. Details of the test query selection would be described in the evaluation metrics sections. 
+The test set was manually created in order for us to evaluate the performance of our search engine. Two main test sets were created: one for navigational use, and one for informational use. This means that one test set is specifically created such that the user want \emph{one} specific document (navigational), while the other test set is created to retrieve as many relevant documents as possible (informational). Both test sets included queries and relevant documents related to the queries (so that recall can be calculated). The composition of each test dataset is shown in Table \ref{dataset-table}. A justification for the choice of test queries follows in section \ref{ssub:evaluation_queries}. 
 
 \begin{table}[H]
 \centering
-\caption{compositions of test datasets}
-\label{my-label}
+\caption{Composition of test datasets}
+\label{dataset-table}
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{|l|l|l|l|l|l|l|l|l|}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|c|c|c|c|}
 \hline
-        & moodle  & degree & junwang & alphago &IRDM &computer graphics syllabus&bioinformatics \\ \hline
-number of relevant links& 2& 87 &30&4&62&75&36\\ \hline
-number of irrelevant links& 67&65&71&26&34&44&33\\ \hline
-total number of links &69&152&101&30&96&119&69\\ \hline
+Query & Total labels & Relevant & Non-relevant \\ \hline
+\textbf{Informational} \\ \hline
+degree & 152 & 87 & 65 \\ \hline 
+Jun Wang & 101 & 30 & 65 \\ \hline
+alphaGO & 30 & 26 & 4 \\ \hline
+\textbf{Navigational} \\ \hline
+moodle & 69 & 2 & 67 \\ \hline
+information retrieval and data mining & 96 & 62 & 34 \\ \hline
+computer graphics syllabus & 119 & 44 & 75\\ \hline
+bioinformatics home page & 69 & 36 & 33 \\ \hline
 \end{tabular}%
 }
 \end{table}
@@ -219,6 +226,7 @@ We used Jelinek-Mercer Smoothing, in which the parameter $\lambda$ is a constant
 The choice of evaluation metrics is central in measuring retrieval performance. A suitable metric quantifies how well the results of the algorithms conform with expected values. The most common metrics in evaluation within information retrieval are precision, recall and the F1 score. These three are the main evaluation methods used within this project. We have also reported Discounter Cumulative Gain (DCG). Each method will be explained in detail in the following subsections. The evaluation is performed on all the ranking algorithms: Boolean retrieval, TF-IDF, BM25 and query likelihood, both in the case of using PageRank and the case without PageRank.
 
 \subsubsection{Queries}
+\label{ssub:evaluation_queries}
 Commonly, there are three types of search query people type into a search engine: \emph{informational queries}, \emph{navigational queries} and \emph{transactional queries}.
 Informational queries are normally defined as queries that give the user information about a certain topic, such as a specific place, person, items etc. These queries are normally used when the user is looking for a wider range of information related to the query rather than a specific website. Hence, a greater number of relevant documents should be retrieved by the informational queries than the transactional and navigational queries. Our test set includes informational queries 'jun wang', 'degree', 'alphaGO' and 'new research'. We chose these queries for their varying levels of generality such that we could compare the performances of engines with more specific as well as more general queries.
 
