@@ -17,9 +17,6 @@ class BM25Ranking(Ranking):
         third = f + k1 * (1-b + b*(dl/avdl))
         return first * (second / third)
 
-    def compute_K(self, dl, avdl, k1, b):
-        return k1 * ((1-b) + b * (float(dl)/float(avdl)))
-
     def get_length(self, table, docid):
         if docid in table:
             return table[docid]

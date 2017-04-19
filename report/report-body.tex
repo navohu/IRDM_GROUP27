@@ -72,7 +72,27 @@ Based on these URLs, an inverted index is created, consisting of a dictionary th
 \subsubsection{Crawling} % (fold)
 \label{ssub:crawling}
 
-The crawling was done through an open source platform called Scrapy written in Python.\footnote{https://scrapy.org} This platform is given a start URL "\url{www.cs.ucl.ac.uk}", followed by a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. This would include pages such as "\url{www.cs.ucl.ac.uk/home}", and "\url{www.wiki.cs.ucl.ac.uk}". We set a \emph{maximum depth} of the crawler because we found some links that were extremely long only contained parts of the internal index of the CS website practically never opened by visitors to the website.
+The crawling was done through an open source platform called Scrapy written in Python.\footnote{https://scrapy.org} This platform is given a start URL "\url{www.cs.ucl.ac.uk}", followed by a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. This would include pages such as "\url{www.cs.ucl.ac.uk/home}", and "\url{www.wiki.cs.ucl.ac.uk}". We set a \emph{maximum depth} of the crawler because we found some links that were extremely long only contained parts of the internal index of the CS website that were practically never opened by visitors to the website. The crawler also made sure not to crawl already crawled links. In the graph in Figure \ref{fig:graph} we can see an example where some links are pointing back to the root. These links would therefore not be crawled again.
+
+\begin{figure}[!h]
+\centering
+\begin{tikzpicture}[-latex ,auto ,node distance =3cm and 2cm ,on grid ,
+                    semithick , state/.style ={ circle ,top color =white , 
+                    bottom color = white!20 , draw, black , 
+                    text=black , minimum width =1 cm}]
+\node[state] (C) {$cs.ucl.ac.uk/home$};
+\node[state] (A) [above left=of C] {$cs.ucl.ac.uk$};
+\node[state] (B) [above right =of C] {$cs.ucl.ac.uk/research$};
+\path (A) edge [loop left] node[left] {} (A);
+\path (C) edge [bend left =25] node[below =0.15 cm] {} (A);
+\path (A) edge [bend right = -15] node[below =0.15 cm] {} (C);
+\path (A) edge [bend left =25] node[above] {} (B);
+\path (B) edge [bend left =15] node[below =0.15 cm] {} (A);
+\path (C) edge [bend left =15] node[below =0.15 cm] {} (B);
+\end{tikzpicture}
+\caption{The figure shows a small transition diagram between three websites and how they are related to each other.}
+\label{fig:graph}
+\end{figure}
 
 The elements that were crawled from the website were the urls, titles ($<$h1$>$ tags) and the anchor text. This information, along with a unique identifier, was stored in the table \emph{cs\_sites}. We didn't crawl and store the content of the pages because of storage limitations. As long as all links of the domain are contained in the database, it is easy to access the content of each page at the indexing stage.
 
@@ -211,8 +231,6 @@ DCG is a measure of ranking quality. It is used to evaluate the ranking of retri
 \subsection{Analysis of Results} % (fold)
 \label{sub:analysis_of_results}
 
-TODO: Talk about time to rank
-
 The following tables indicate the results of precision, recall and F1 score of tests on queries 'degree', 'jun wang' and 'moodle' respectively. There are totally 68, 10 and 2 relevant documents in the queries of 'degree', 'jun wang' and 'moodle' test pools. 
 
 It can be seen that the BM25 has the best performance on both precision and recall among all three algorithms. This could because that the penalty on term frequency and document length that BM25 implements helps to avoid retrieving non-relevant documents. Also, it strikes to the eyes that specific query 'jun wang' gives higher recall while lower precision performance than the general query 'degree'. This could because the specificity of the query restricts the total number of relevant documents and therefore search engines would be easier to retrieve most of those documents. However, a general query allows more documents to be relevant, and hence the precision would be higher. 
@@ -277,33 +295,34 @@ moodle  & 4     & 4               & 4      \\ \hline
 \end{tabular}
 \end{table}
 
-\textbf{TIME}
-
-\begin{table}[]
+\begin{table}[!h]
 \centering
 \caption{Time of queries with PageRank}
 \label{tab:time}
 \begin{tabular}{|l|l|}
 \hline
-        & Time  \\ \hline
-BM25            & 4.61880669593811 \\ \hline
-QueryLikelihood & 2.1089548110961913\\ \hline
-TF-IDF          & 2.9961967706680297\\ \hline
+        & Avg. Time  \\ \hline
+BM25            & 4.619 \\ \hline
+QueryLikelihood & 2.109\\ \hline
+TF-IDF          & 2.996\\ \hline
 \end{tabular}
 \end{table}
 
-\begin{table}[]
+\begin{table}[!h]
 \centering
 \caption{Time of queries without PageRank}
 \label{tab:time_pr}
 \begin{tabular}{|l|l|l|l|}
 \hline
-        & Time  \\ \hline
-BM25            & 4.011985206604004 \\ \hline
-QueryLikelihood & 1.2295216083526612\\ \hline
-TF-IDF          & 2.109076404571533 \\ \hline
+        & Avg. Time  \\ \hline
+BM25            & 4.012\\ \hline
+QueryLikelihood & 1.23\\ \hline
+TF-IDF          & 2.109 \\ \hline
 \end{tabular}
 \end{table}
+
+Another aspect to take into consideration when evaluating performance of an algorithm is the time taken to rank the documents. Table \ref{tab:time} and \ref{tab:time_pr} shows the average time of 10 query words of different lengths, both with and without PageRank. Firstly, we can observe that BM25 spends considerably more time than the others. It is hard to explain the exact reason why it is spending almost double the time, but it might be caused by some implementation issues where for example the database gets called more than usual. Query likelihood seems to perform better than TF-IDF overall as well. It can also be observed a small increase in the timing when applying PageRank to the queries. This can especially be seen for the query likelihood where the time was increased by 42\%.
+
 
 % subsection analysis_of_results (end)
 
