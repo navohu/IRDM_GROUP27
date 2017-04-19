@@ -377,20 +377,16 @@ During the evaluation we had a limitation in our test set. The test set could be
 
 Because of time restrictions, we also had to leave out a deep learning based ranking algorithm we were hoping to build. Although we do not have an implementation, we have a vision of how we wanted to design this ranker. It would be based on a deep neural network that would receive the scores of each of our 5 models, including PageRank, as input. To further increase the number of features, our second index with raw (unstemmed) document terms could be used, as well. The network would then weight the given scores appropriately such that its output rankings would match the labeled rankings of a training set as closely as possible. In this way, it would have been able to take advantage of the respective strengths of each of our algorithms while compensating for their individual weaknesses.
 
-We believe our deep learning assisted ranking could have been a novel contribution to the problem of IR, as no other model is likely to be built up of exactly our choice of features, and converge on the exact same weights in the training process, especially given our original test set. However, one limitation that would have made an application of deep learning difficult in our case was the manually defined set of test queries. When training a large neural network for the general task of ranking search results, a large amount data is needed to achieve comparable performance on an unseen test set compared to the training set. A training set that is too small is highly likely to lead to overfitting instead. Furthermore, the requirement of an intimate connection to our evaluation metrics was another limiting factor in implementing the proposed method, as the evaluation is not fully packed in a standalone module and is largely based on independent notebook files.
-
 % section discussion_&_limitations (end)
 
 \section{Conclusion} % (fold)
 \label{sec:conclusion}
 
-Our results
-Have we reached our goal?
-Describe our methods again and how they were used to get what we wanted
-Future work
-- deep learning
-
 From our results, it can be concluded that our model behaves in a desirable way. It successfully retrieves relevant documents to our queries and BM25 managed to achieve precision results up to 70\%, as well as recall results up to 62\%. The goal of the project was to rank and compare different models, which has been achieved through both crawling, indexing and implementing five main algorithms. The four algorithms Boolean Retrieval, TF-IDF, BM25, Query Likelihood behaved in an expected manner according to previous work in the field. One surprising conclusion from the results was how PageRank didn't add any value to retrieving relevant documents, but instead decreased both precision and recall values for all the ranking algorithms. 
+
+For future work we believe our deep learning assisted ranking could have been a novel contribution to the problem of IR, as no other model is likely to be built up of exactly our choice of features, and converge on the exact same weights in the training process, especially given our original test set. However, one limitation that would have made an application of deep learning difficult in our case was the manually defined set of test queries. When training a large neural network for the general task of ranking search results, a large amount of data is needed to achieve comparable performance on an unseen test set compared to the training set. A training set that is too small is highly likely to lead to over fitting instead. Furthermore, the requirement of an intimate connection to our evaluation metrics was another limiting factor in implementing the proposed method, as the evaluation is not fully packed in a standalone module and is largely based on independent notebook files.
+
+
 
 % section conclusion (end)
 
