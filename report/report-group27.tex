@@ -13,11 +13,13 @@
 \usepackage{hyperref}
 \usepackage{multirow}
 \usepackage{rotating}
-\usepackage{subfig}% http://ctan.org/pkg/subfig
+% \usepackage{subfig}% http://ctan.org/pkg/subfig
 \usepackage {tikz}
 \usetikzlibrary {positioning}
 %\usepackage {xcolor}
 \definecolor {processblue}{cmyk}{0.96,0,0,0}
+\usepackage{caption}
+\usepackage{subcaption}
 
 % \makeatletter
 % \def\@copyrightspace{\relax}
@@ -50,7 +52,7 @@
 
 
 \begin{abstract}
-
+Searching the web is an everyday task for many people, where needs of both relevancy, speed and accuracy of results are highly desired. Since the web consists of so many inconsistencies in terms of relevant word to a specific page, this has not been an effortless task to maximise user needs. A lot or research has been conducted in producing different algorithms to optimise the search results in a search engine. The goal is to give the user the most relevant documents, given one or multiple search terms. This report explores well known ranking algorithms, tested on the "cs.ucl.ac.uk" domain. The four algorithm that were implemented in our search engine were Boolean retrieval, TF-IDF, BM25 and Query Likelihood. In addition to the ranking algorithms, a pure weighting algorithm, PageRank, was implemented to potentially increase the performance of our search engine. After evaluating our results through precision, recall and the F1 measure we concluded that BM25 performed best out of the four ranking algorithms. It was also observed that PageRank did not improve upon our results, but rather made it worse. 
 \end{abstract}
 
 \maketitle

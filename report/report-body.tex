@@ -244,6 +244,25 @@ DCG is a measure of ranking quality. It is used to evaluate the ranking of retri
 Table 2 and 3 indicate the results of average precision, recall and F1 score of tests on algorithms with informational and navigational queries where informational queries include 'degree', 'jun wang' and 'alphago' and navigational queries inlcude 'moodle', 'computer graphical syllabus', 'bioinformatics home page' and 'information retrieval and data mining'  respectively. Algorithms include BM25, QueryLikelihood( QL), Boolean, TF-IDF, BM25 with Pagerank( BM25PR), TF-IDF with Pagerank( TF-IDFPR) and QL with Pagerank. There are totally about 100 links for each query and various number of relevant documents depending on the query.
 
 It can be seen that without consideration of result ranking, the BM25 has the leading performance with both informational and navigational query. This could because that the penalty on term frequency and document length that BM25 implements helps to avoid retrieving non-relevant documents. Also, it strikes to the eyes that algorithms implemented with page ranking are actually worse than them along. One possible reason is that page rank depends on the number of anchors to the objective page, which means the more pages pointing to the objective page, the higher page rank it will receive. However, in our experiment, relevant documents to our queries might not be more popular than the non-relevant ones, therefore the page rank( QLPR) would be a noise while the search engine predicting the relevance. Although more test sets would be required to determine whether the combination is worse than the individual model.
+\begin{figure*}[!t]
+    \centering
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figure5}
+        \caption{Precision/recall plot of query 'degree'}
+        \label{fig:degree}
+        \vskip -6pt
+    \end{subfigure}%
+    ~ 
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figure6}
+        \caption{Precision/recall plot of query 'alphago'}
+        \label{fig:alphago}
+        \vskip -6pt
+    \end{subfigure}
+    \caption{Precision/recall curves for two example queries.}
+\end{figure*}
 
 Also, it is interesting to see that the number of recall of results retrieved by navigational queries is generally higher than it of informational queries. This is because that the nature of navigational queries restricts the number of relevant documents. For example, people are just looking for the login page  when they search for moodle and there are nearly no extra information about this term, so the relevant documents would be much fewer than relevant documents of, for example, computer science which is an informational term. Therefore, it is easier for search engine to retrieve most of pages that are relevant to the navigational queries than informational queries.
 
@@ -280,22 +299,24 @@ F1 score  & 0.49& 0.44& 47& 0.36& 0.31&0.26 & 0.43\\ \hline
 }
 \end{table}
 
-Last but not the least, Figure \ref{fig:alphago} and \ref{fig:degree} show the precision and recall plots with the query 'alphago' and 'degree'. It can be seen that every model could retrieve all documents relate to the query 'alpha', while performance of each model varies significantly to the query 'degree' although both queries are informational. This is because the term 'alphago' is still so new and unique that only pages relate to this topic would include this term, and the amount of these pages is also few, therefore, any model could easily retrieve them. In contrast, the term 'degree' is much more general and polular, hence even non-relevant pages might incude this term which would make it difficult for models to retrieve its relevant documents.
-\begin{figure}[!h]
-\centering
-\includegraphics[width=\linewidth]{figure5}
-\caption{precision recall plot of query 'alphago'}
-\label{fig:alphago}
-\vskip -6pt
-\end{figure}
+Last but not the least, Figure \ref{fig:degree} and \ref{fig:alphago} show the precision and recall plots with the query 'alphago' and 'degree'. It can be seen that every model could retrieve all documents relate to the query 'alpha', while performance of each model varies significantly to the query 'degree' although both queries are informational. This is because the term 'alphago' is still so new and unique that only pages relate to this topic would include this term, and the amount of these pages is also few, therefore, any model could easily retrieve them. In contrast, the term 'degree' is much more general and polular, hence even non-relevant pages might incude this term which would make it difficult for models to retrieve its relevant documents.
 
-\begin{figure}[!h]
-\centering
-\includegraphics[width=\linewidth]{figure6}
-\caption{precision recall plot of query 'degree'}
-\label{fig:degree}
-\vskip -6pt
-\end{figure}
+
+% \begin{figure}[!h]
+% \centering
+% \includegraphics[width=\linewidth]{figure5}
+% \caption{Precision/recall plot of query 'degree'}
+% \label{fig:degree}
+% \vskip -6pt
+% \end{figure}
+
+% \begin{figure}[!h]
+% \centering
+% \includegraphics[width=\linewidth]{figure6}
+% \caption{Precision/recall plot of query 'alphago'}
+% \label{fig:alphago}
+% \vskip -6pt
+% \end{figure}
 
 Table 3 shows the DCG of performances of each algorithms with different types of queires. BM25 still has significantly better performance than others. We could interpret that BM25 is the best algorithm among those seven. Again, it can be seen that DCG of results from navigational queries is generally higher than informational queries, and hence we can conclude that metrics are also depending on the type of queries rather than algorithm along. Beside, BM25 does not perform well for every search term although it has a better overall performance than other models. For example, For the term bioinformatics, the model BMPG could actually outperform it. Also, for the term alphago, since there are too few of relevant pages, nearly every model could find all of them and put them on the top of the list. 
 
