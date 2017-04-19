@@ -131,6 +131,9 @@ The PageRank is then used in our search engine to rank the differences between s
 \subsubsection{Boolean Retrieval} % (fold)
 \label{ssub:boolean_retrieval}
 
+Boolean retrieval is a simple ranking algorithm that checks for the presence of query terms in a document. A boolean query can be built up with connectors AND, OR and NOT. All documents that contain terms connected by AND, one or more terms connected by OR, and no terms preceded by NOT, are returned. We implemented Basic Boolean retrieval, in which no distinction in relevance is made between the matching documents. In this model, a document with just one mention of each search term is equally likely to appear at the top of the results as one having a high frequency of the terms. Due to its simplicity, this method serves as a performance baseline to which more advanced algorithms can be compared.
+
+To ensure compatibility between search engine interfaces and comparability of results, we implemented the Basic Boolean model using free text queries instead of a boolean syntax. This means that all natural language queries are considered AND queries. It would not have made sense to compare the results of a "software OR vision AND NOT robot" query to any free text query fed into our remaining models, which is why limiting the connectors to AND is sufficient in this case.
 % subsubsection boolean_retrieval (end)
 
 \subsubsection{TF-IDF} % (fold)
