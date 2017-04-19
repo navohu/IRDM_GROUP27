@@ -280,6 +280,21 @@ F1 score  & 0.49& 0.44& 47& na& 0.31&0.26 & 0.43\\ \hline
 }
 \end{table}
 
+Last but not the least, figure 5 and 6 show the precision and recall plots with the query 'alphago' and 'degree'. It can be seen that every model could retrieve all documents relate to the query 'alpha', while performance of each model varies significantly to the query 'degree' although both queries are informational. This is because the term 'alphago' is still so new and unique that only pages relate to this topic would include this term, and the amount of these pages is also few, therefore, any model could easily retrieve them. In contrast, the term 'degree' is much more general and polular, hence even non-relevant pages might incude this term which would make it difficult for models to retrieve its relevant documents.
+\begin{figure}
+\centering
+\includegraphics[height=1in, width=1in]{figure5}
+\caption{precision recall plot of query 'alphago'}
+\vskip -6pt
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[height=1in, width=1in]{figure6}
+\caption{precision recall plot of query 'degree'}
+\vskip -6pt
+\end{figure}
+
 Table 3 shows the DCG of performances of each algorithms with different types of queires. BM25 still has significantly better performance than others. We could interpret that BM25 is the best algorithm among those seven. Again, it can be seen that DCG of results from navigational queries is generally higher than informational queries, and hence we can conclude that metrics are also depending on the type of queries rather than algorithm along. Beside, BM25 does not perform well for every search term although it has a better overall performance than other models. For example, For the term bioinformatics, the model BMPG could actually outperform it. Also, for the term alphago, since there are too few of relevant pages, nearly every model could find all of them and put them on the top of the list. 
 
 
