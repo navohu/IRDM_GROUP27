@@ -223,29 +223,29 @@ We used Jelinek-Mercer Smoothing, in which the parameter $\lambda$ is a constant
 \subsection{Evaluation Metrics} % (fold)
 \label{sub:metrics_&_analysis}
 
-The choice of evaluation metrics is central in measuring retrieval performance. A suitable metric quantifies how well the results of the algorithms conform with expected values. The most common metrics in evaluation within information retrieval are precision, recall and the F1 score. These three are the main evaluation methods used within this project. We have also reported Discounter Cumulative Gain (DCG). Each method will be explained in detail in the following subsections. The evaluation is performed on all the ranking algorithms: Boolean retrieval, TF-IDF, BM25 and query likelihood, both in the case of using PageRank and the case without PageRank.
+The choice of evaluation metrics is central in measuring retrieval performance. A suitable metric quantifies how well the results of the algorithms conform with expected values. The most common metrics in evaluation within information retrieval are precision, recall and the F1 score. These three are the main evaluation methods used within this project. We have also reported Discounted Cumulative Gain (DCG). Each method will be explained in detail in the following subsections. The evaluation is performed on all the ranking algorithms: Boolean retrieval, TF-IDF, BM25 and query likelihood, both in the case of using PageRank and the case without PageRank.
 
 \subsubsection{Queries}
 \label{ssub:evaluation_queries}
-Commonly, there are three types of search query people type into a search engine: \emph{informational queries}, \emph{navigational queries} and \emph{transactional queries}.
-Informational queries are normally defined as queries that give the user information about a certain topic, such as a specific place, person, items etc. These queries are normally used when the user is looking for a wider range of information related to the query rather than a specific website. Hence, a greater number of relevant documents should be retrieved by the informational queries than the transactional and navigational queries. Our test set includes informational queries 'jun wang', 'degree', 'alphaGO' and 'new research'. We chose these queries for their varying levels of generality such that we could compare the performances of engines with more specific as well as more general queries.
+Commonly, there are three types of search queries people type into a search engine: \emph{informational queries}, \emph{navigational queries} and \emph{transactional queries}.
+Informational queries are normally defined as queries that give the user information about a certain topic, such as a specific place, person, items etc. These queries are normally used when the user is looking for a wider range of information related to the query rather than a specific website. Hence, a greater number of relevant documents should be retrieved by the informational queries than the transactional and navigational queries. Our test set includes a numerous of these informational queries. We chose the queries by varying levels of generality such that we could compare the performances of engines with more specific queries as well as more general queries.
 
-Navigational queries are frequently used when someone is trying to find a certain website or portal. For example, a user might enter 'Facebook' into the search bar to find the Facebook website rather than directly entering the url into the browser's navigational bar. Therefore, the navigational results should be ranked on the top for this kinds of queries. However, queries can be ambiguous, in which case they could be interpreted as either navigational or informational. For example, users who search for 'Facebook' might actually be looking for news of Facebook. We decided to use 'Moodle', 'bioinformatics home page' and 'computer graphics syllabus' to represent navigational queries.
+Navigational queries are frequently used when someone is trying to find a certain website or portal. For example, a user might enter 'Facebook' into the search bar to find the Facebook website rather than directly entering the url into the browser's navigational bar. Therefore, the navigational results should be ranked on the top for this kinds of queries. However, queries can be ambiguous, in which case they could be interpreted as either navigational or informational. For example, users who search for 'Facebook' might actually be looking for news of Facebook. We decided to use 'Moodle', 'bioinformatics home page' and 'computer graphics syllabus' to represent navigational queries on the CS website.
 
-A transactional query shows an intent to complete a transaction, e.g. making a purchase or paying fees. We omitted this query category from our test set since it did not seem appropriate for our domain: there are too few transactional links under cs.ucl.ac.uk.
+A transactional query shows an intent to complete a transaction, e.g. making a purchase or paying fees. We omitted this query category from our test set since it did not seem appropriate for our domain.
 
 \subsubsection{Recall, Precision and F1}
 Recall, precision and the F1 score are the most popular metrics to evaluate the performance of a search engine. Precision and recall are both inversely related which means that a high precision will normally give a lower recall and vice versa.
 
 Recall is the ratio between the number of relevant documents retrieved by the search engine and the number of total relevant documents in the database. The formula is shown as below: 
 
-\[recall=\frac{\mid relevant documents\cap retrieved documents\mid}{\mid relevant documents \mid}\]
+\[recall=\frac{|relevant\ documents\cap retrieved\ documents|}{|relevant\ documents|}\]
 
 However, it does not make sense to pursue 100\% recall by returning all documents in response to every query. Therefore, recall alone is not good enough and instead one also needs to measure the non-relevant document retrieved. Precision is a good supplementary metric for exactly this. It measures the ratio between the number of relevant documents retrieved and the total number of document retrieved by the search engine. The formula for precision is shown as below:
 
-\[precision=\frac{\mid relevant documents\cap retrieved documents\mid}{\mid retrieved documents \mid}\]
+\[precision=\frac{|relevant\ documents\cap retrieved\ documents|}{| retrieved\ documents |}\]
 
-The F1 score is a good measure of accuracy of the result of the given search engine. It considers both precision and recall of the test to compute the score. The general formula of the F1 score is as follow:
+The F1 score is a good measure for the accuracy of the results of the given search engine. It considers both precision and recall of the test to compute the score. The general formula of the F1 score is as follow:
 
 \[F1=(1+\beta^{2})\cdot \frac{precision\cdot recall}{(\beta^{2}\cdot precision)+recall}\]
 
@@ -324,12 +324,12 @@ DCG is a measure of ranking quality. It is used to evaluate the ranking of retri
 
 \subsection{Analysis of Results} % (fold)
 \label{sub:analysis_of_results}
-Our precision, recall and F1 score results are shown in Tables \ref{inform} and \ref{nav}. These scores are averaged by query type according to the 3 informational and 4 navigational queries described it section \ref{sub:dataset_description}. Algorithms include BM25, Query Likelihood (QL), Boolean, TF-IDF, BM25 with PageRank (BM25PR), TF-IDF with PageRank (TF-IDFPR) and QL with PageRank (QLPR).
+Our precision, recall and F1 score results are shown in table \ref{inform} and \ref{nav}. These scores are averaged by the query types according to the 3 informational and 4 navigational queries described it section \ref{sub:dataset_description}. Algorithms include BM25, Query Likelihood (QL), Boolean, TF-IDF, BM25 with PageRank (BM25PR), TF-IDF with PageRank (TF-IDFPR) and QL with PageRank (QLPR).
 
 \subsubsection{Ranking relevance}
-It can be seen that without consideration of result ranking, the BM25 has the leading performance with both informational and navigational query. This could because that the penalty on term frequency and document length that BM25 implements helps to avoid retrieving non-relevant documents. Perhaps surprisingly, algorithms implemented with page ranking actually perform worse than them along. One possible reason is that page rank depends on the number of anchors to the objective page, which means the more pages pointing to the objective page, the higher page rank it will receive. However, in our experiment, relevant documents to our queries might not be more popular than the non-relevant ones, therefore the page rank( QLPR) would be a noise while the search engine predicting the relevance. Although more test sets would be required to determine whether the combination is worse than the individual model.
+The tables indicates that BM25 has a higher performance on both the informational and navigational queries. The reason of this could be caused by the penalty on the BM25 has on term frequency and document length in order to avoid retrieving non-relevant documents. Surprisingly, algorithms implemented with PageRank actually perform worse than the ones without. A possible reason might be of the origin of our web pages. The CS domain might not have as many pointing pages to hold the theorem that PageRank builds upon, namely that more popular pages has a higher long term visit rate.  More test sets would be necessary in order to determine whether the combination of the use of PageRank is better or worse than the individual model without PageRank.
 
-Also, it is interesting to see that the number of recall of results retrieved by navigational queries is generally higher than it of informational queries. This is because that the nature of navigational queries restricts the number of relevant documents. For example, people are just looking for the login page  when they search for moodle and there are nearly no extra information about this term, so the relevant documents would be much fewer than relevant documents of, for example, computer science which is an informational term. Therefore, it is easier for search engine to retrieve most of pages that are relevant to the navigational queries than informational queries.
+It is also interesting to observe that the recall values from the navigational queries is generally higher than the ones from the informational queries. This is because the navigational queries naturally restricts the number of relevant documents. For example, a user might expect the Moodle login page with the query 'moodle'. Since there are almost no extra information about this query the relevant documents would be very few. In the case of using a query such as "computer science" the number of relevant documents are expected to be much higher. Therefore, it is easier for the search engine to retrieve more relevant documents for the navigational queries than the informational queries.
 
 \begin{figure*}[!t]
     \centering
@@ -351,10 +351,9 @@ Also, it is interesting to see that the number of recall of results retrieved by
     \caption{Precision/recall curves for two example queries.}
 \end{figure*}
 
-Last but not the least, Figure \ref{fig:degree} and \ref{fig:alphago} show the precision and recall plots with the query 'alphago' and 'degree'. It can be seen that every model could retrieve all documents relate to the query 'alpha', while performance of each model varies significantly to the query 'degree' although both queries are informational. This is because the term 'alphago' is still so new and unique that only pages relate to this topic would include this term, and the amount of these pages is also few, therefore, any model could easily retrieve them. In contrast, the term 'degree' is much more general and polular, hence even non-relevant pages might incude this term which would make it difficult for models to retrieve its relevant documents.
+Figure \ref{fig:degree} and \ref{fig:alphago} show the precision and recall plots with the query 'AlphaGo' and 'degree'. It can be seen that every model could retrieve all documents relate to the query 'AlphaGo', while performance of each model varies significantly to the query 'degree' although both queries are informational. The reason of this phenomenon is because the term 'AlphaGo' is still so new and unique that only a handful of pages that are actually using this term. Since the amount of documents in the collection that included the query 'AlphaGo' was only four documents, all of the models could easily retrieve them. In contrast, the term 'degree' is much more general and popular, hence even non-relevant pages might include this term which would make it difficult for models to retrieve its relevant documents.
 
-Table 3 shows the DCG of performances of each algorithms with different types of queires. BM25 still has significantly better performance than others. We could interpret that BM25 is the best algorithm among those seven. Again, it can be seen that DCG of results from navigational queries is generally higher than informational queries, and hence we can conclude that metrics are also depending on the type of queries rather than algorithm along. Beside, BM25 does not perform well for every search term although it has a better overall performance than other models. For example, For the term bioinformatics, the model BMPG could actually outperform it. Also, for the term alphago, since there are too few of relevant pages, nearly every model could find all of them and put them on the top of the list. 
-
+Table \ref{dcg} shows the DCG of performances of each of the algorithms with different types of queries. BM25 still has significantly better performance than the others, and we could easily interpret that BM25 is the best algorithm among those seven. Again, it can be seen that the DCG of the results from navigational queries is generally higher than informational queries, hence we could interpret this to that the metrics are also depending on the type of the query rather than only the specific ranking algorithm. Beside, BM25 does not perform well for every search term although it has a better overall performance than other models. For example, the term 'bioinformatics' was outperformed by the BMPG model.
 
 \subsubsection{Ranking time}
 
@@ -380,6 +379,14 @@ During the evaluation we had a limitation in our test set. The test set could be
 
 \section{Conclusion} % (fold)
 \label{sec:conclusion}
+
+Our results
+Have we reached our goal?
+Describe our methods again and how they were used to get what we wanted
+Future work
+- deep learning
+
+From our results, it can be concluded that our model behaves in a desirable way. It successfully retrieves relevant documents to our queries and BM25 managed to achieve precision results up to 70\%, as well as recall results up to 62\%. The goal of the project was to rank and compare different models, which has been achieved through both crawling, indexing and implementing five main algorithms. The four algorithms Boolean Retrieval, TF-IDF, BM25, Query Likelihood behaved in an expected manner according to previous work in the field. One surprising conclusion from the results was how PageRank didn't add any value to retrieving relevant documents, but instead decreased both precision and recall values for all the ranking algorithms. 
 
 % section conclusion (end)
 
