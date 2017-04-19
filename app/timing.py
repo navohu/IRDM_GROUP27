@@ -2,6 +2,7 @@ import time
 import csv
 from app.ranking import Ranking
 from app.search_engine import SearchEngine
+from app.boolean.boolean_ranking import BooleanRanking
 from app.query_likelihood.query_likelihood_ranking import QueryLikelihoodRanking
 from app.BM25.bm25 import BM25Ranking
 from app.TFIDF.tf_idf import TFIDFRanking
@@ -43,7 +44,7 @@ class Timing():
 if __name__ == "__main__":
     queries = ["jun wang", "degree", "moodle", "alphago", "information retrieval and data mining", "computer graphics syllabus", "ai research", "new research", "emine yilmaz", "computational complexity"]
     timing = Timing()
-    rankings = [BM25Ranking(), TFIDFRanking(), QueryLikelihoodRanking()]
+    rankings = [BooleanRanking(), BM25Ranking(), TFIDFRanking(), QueryLikelihoodRanking()]
     use_pagerank = False
     for ranking in rankings:
         timing.set_search_engine(SearchEngine(ranking))
