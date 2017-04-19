@@ -2,7 +2,7 @@
 
 The end of the 20th century gave rise to a need to quickly obtain information on the World Wide Web. As a result of this, search engines were developed and are one of the most common methods to find information online today. Competition between different search engines has been present since the start, but Google has long ruled the market. Its has become widely used because its algorithms have outperformed those of other search engines. Not all of the algorithms that Google is using are publicly available, but those that are known have been present through decades, such as TF-IDF, BM25, PageRank and query likelihood ranking.
 
-The aim of this report is to explore existing algorithms for information retrieval and how they perform against each other. The search engine was implemented on the "cs.ucl.ac.uk" domain and includes several preprocessing techniques and data transformations. The application includes implementations of several ranking algorithms and an evaluation of the results. The search engine application built for this project can be found on \url{github.com/navohu/IRDM_GROUP27} and has been implemented in Python.\footnote{All instructions for running the application can be found in the README file in the repository.} Initially, our expectations for the project were to produce results that showed the difference of the current working algorithms, as well as an implementation of a deep learning algorithm. Since our project only included a search on the CS website it would imply that the amount of data might not be sufficient for a deep learning approach.
+The aim of this report is to explore existing algorithms for information retrieval and how they perform against each other. The search engine was implemented on the "cs.ucl.ac.uk" domain and includes several preprocessing techniques and data transformations. The application includes implementations of several ranking algorithms and an evaluation of the results. The search engine application built for this project can be found on \url{github.com/navohu/IRDM_GROUP27} and has been implemented in Python\footnote{All instructions for running the application can be found in the README file in the repository.}. Initially, our expectations for the project were to produce results that showed the difference of the current working algorithms, as well as an implementation of a deep learning algorithm. Since our project only included a search on the CS website it would imply that the amount of data might not be sufficient for a deep learning approach.
 
 
 
@@ -72,27 +72,7 @@ Based on these URLs, an inverted index is created, consisting of a dictionary th
 \subsubsection{Crawling} % (fold)
 \label{ssub:crawling}
 
-The crawling was done through an open source platform called Scrapy written in Python.\footnote{https://scrapy.org} This platform is given a start URL "\url{www.cs.ucl.ac.uk}", followed by a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. This would include pages such as "\url{www.cs.ucl.ac.uk/home}", and "\url{www.wiki.cs.ucl.ac.uk}". We set a \emph{maximum depth} of the crawler because we found some links that were extremely long only contained parts of the internal index of the CS website that were practically never opened by visitors to the website. The crawler also made sure not to crawl already crawled links. In the graph in Figure \ref{fig:graph} we can see an example where some links are pointing back to the root. These links would therefore not be crawled again.
-
-\begin{figure}[!h]
-\centering
-\begin{tikzpicture}[-latex ,auto ,node distance =3cm and 2cm ,on grid ,
-                    semithick , state/.style ={ circle ,top color =white , 
-                    bottom color = white!20 , draw, black , 
-                    text=black , minimum width =1 cm}]
-\node[state] (C) {$cs.ucl.ac.uk/home$};
-\node[state] (A) [above left=of C] {$cs.ucl.ac.uk$};
-\node[state] (B) [above right =of C] {$cs.ucl.ac.uk/research$};
-\path (A) edge [loop left] node[left] {} (A);
-\path (C) edge [bend left =25] node[below =0.15 cm] {} (A);
-\path (A) edge [bend right = -15] node[below =0.15 cm] {} (C);
-\path (A) edge [bend left =25] node[above] {} (B);
-\path (B) edge [bend left =15] node[below =0.15 cm] {} (A);
-\path (C) edge [bend left =15] node[below =0.15 cm] {} (B);
-\end{tikzpicture}
-\caption{The figure shows a small transition diagram between three websites and how they are related to each other.}
-\label{fig:graph}
-\end{figure}
+The crawling was done through an open source platform called Scrapy\footnote{https://scrapy.org} written in Python. This platform is given a start URL "\url{www.cs.ucl.ac.uk}", followed by a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. This would include pages such as "\url{www.cs.ucl.ac.uk/home}", and "\url{www.wiki.cs.ucl.ac.uk}". We set a \emph{maximum depth} of the crawler because we found some links that were extremely long only contained parts of the internal index of the CS website practically never opened by visitors to the website.
 
 The elements that were crawled from the website were the urls, titles ($<$h1$>$ tags) and the anchor text. This information, along with a unique identifier, was stored in the table \emph{cs\_sites}. We didn't crawl and store the content of the pages because of storage limitations. As long as all links of the domain are contained in the database, it is easy to access the content of each page at the indexing stage.
 
@@ -112,13 +92,11 @@ To map each word to the IDs of documents it appears in, and then reduce that set
 
 The ranking algorithms we applied on the inverted index can roughly be divided into two categories: standalone rankers and query-insensitive supplementary metrics. In the standalone category, we implemented Boolean retrieval, TF-IDF, BM25 and Query Likelihood ranking. In addition, we added an option to include PageRank scoring to augment the ranking of each of the former algorithms. PageRank itself belongs to the latter supplementary category, since it can not be directly used to retrieve results for a query, as it does not take query terms into consideration and depends on page features only.
 
-All of the standalone algorithms can be run within our app, with or without PageRank. In this way, differences in results returned by the algorithms and their respective ranks can be quickly noticed. A more systematic approach to measure the performance of the different ranking algorithms is through proper evaluation. This is explained in the next section.
-
 
 \subsubsection{PageRank} % (fold)
 \label{ssub:pagerank}
 
-The popular algorithm PageRank was developed by Google for ranking the results within a search engine.\footnote{https://en.wikipedia.org/wiki/PageRank} It is also commonly used for measuring the importance of a website. The algorithm is based on an assumption that more important websites are more likely to be pointed to from other websites.
+The popular algorithm PageRank\footnote{https://en.wikipedia.org/wiki/PageRank} was developed by Google for ranking the results within a search engine. It is also commonly used for measuring the importance of a website. The algorithm is based on an assumption that more important websites are more likely to be pointed to from other websites.
 
 The algorithm implies that it would need a way of representing connections between web sites. This can easily be done with the aid of an adjacency matrix. Firstly, all the connections needed to be measured, which was done by obtaining all the outgoing links for each site in \emph{cs\_sites}. Now, each link would point to a certain number of outgoing links disregarding whether they were in the \emph{cs.ucl.ac.uk} domain or not, but were filtered to eventually only hold links within the CS domain. From these connections an adjacency matrix was produced as shown as an example in Table \ref{fig:adj_mx}. 
 
@@ -151,9 +129,6 @@ The PageRank is then used in our search engine to rank the differences between s
 \subsubsection{Boolean Retrieval} % (fold)
 \label{ssub:boolean_retrieval}
 
-Boolean retrieval is a simple ranking algorithm that checks for the presence of query terms in a document. A boolean query can be built up with connectors AND, OR and NOT. All documents that contain terms connected by AND, one or more terms connected by OR, and no terms preceded by NOT, are returned. We implemented Basic Boolean retrieval, in which no distinction in relevance is made between the matching documents. In this model, a document with just one mention of each search term is equally likely to appear at the top of the results as one having a high frequency of the terms. Due to its simplicity, this method serves as a performance baseline to which more advanced algorithms can be compared.
-
-To ensure compatibility between search engine interfaces and comparability of results, we implemented the Basic Boolean model using free text queries instead of a boolean syntax. This means that all natural language queries are considered AND queries. It would not have made sense to compare the results of a "software OR vision AND NOT robot" query to any free text query fed into our remaining models, which is why limiting the connectors to AND is sufficient in this case.
 % subsubsection boolean_retrieval (end)
 
 \subsubsection{TF-IDF} % (fold)
@@ -173,6 +148,7 @@ where $f_{t,d}$ is the number of term occurrences within a document (TF), while 
 \label{ssub:BM25}
 
 BM25 is another type of ranking algorithm developed by Karen Sparck Jones. It is a newer and improved version of TF-IDF. The BM25 belongs to the probabilistic models and uses the "bag of words" concept for retrieving relevant documents from a given search query. The difference from TF-IDF is how BM25 treats the "TF" term. It adjusts the TF score by The formula to adjust the TF score based on the document length is as below where b and k are constants and L is the length of document:
+
 $$ score(D, Q) = \sum_{i=1}^n IDF(q_i) * \frac{f(q_i, D)* (k + 1)}{f(q_i, D) + k * (1-b + b * \frac{|D|}{avgdl})}$$
 
 where the IDF is defined as in subsection \ref{sub:tf_idf}. The same issue with the IDF term turning negative if a term is present in more than half of the document collection also occur for BM25. Hence, the adjustment of setting the IDF term to a small value was also implemented here.
@@ -182,19 +158,10 @@ where the IDF is defined as in subsection \ref{sub:tf_idf}. The same issue with 
 \subsubsection{Query Likelihood with Smoothing} % (fold)
 \label{ssub:query_likelihood_with_smoothing}
 
-Query likelihood is a probabilistic ranking method which is based on approximating the language model of a document, i.e. a probability distribution of each word appearing in its content. At its simplest, query likelihood ranks documents based on the probability of the query $Q$ of $k$ terms $\{q_1,q_2,...,q_k\}$ being produced from the language model $M_D$ of document $D$:
-
-\[ P(Q | M_D) = P(q_1,q_2,...,q_k | M_D) = \prod_{i=1}^{k} P(q_i | M_D)\]
-
-We used a unigram language model in the interest of storage required by the inverted index. A bi- or trigram model would have required an exponentially larger index to list each sequence of two, or three, words in the document. In our case, the distribution $M_D$ was modelled as the frequency of query term $q$ in the document $D$ as a fraction of the length of $D$:
-\[ M_D = P(q | D) = \frac{tf_{q,D}}{|D|} \]
-
-The problem with this maximum likelihood form is that due to the multiplication of the probabilities of individual terms, any query with even a single term not appearing in the document is assigned a probability of zero. This is not desirable any new word can also appear in the language model with a non-zero probability. This is particularly important for short documents with few words to begin with. In order to handle term frequencies of zero, this estimate must be expanded from a strict term frequency to a metric that also takes a form of background probability into account. The background probability, i.e. how often a word appears in the entire collection of documents $C$, is factored in using a smoothing parameter $\lambda$:
-\[P(q | D) = \lambda * \frac{tf_{q,D}}{|D|} + (1 - \lambda) * \frac{bg_{q,C}}{|C|}\]
-We used Jelinek-Mercer Smoothing, in which the parameter $\lambda$ is a constant. We identified $\lambda = 0.8$ as a good smoothing ratio, returning the most relevant results.
-
-
 % subsubsection query_likelihood_with_smoothing (end)
+
+All of these algorithms could be run within our app by choosing a parameter when executing the Python script. This way it is quick to see the differences between the different algorithms and to see whether they would give different results. A more systematic approach to measure the performance of the different ranking algorithms is through proper evaluation. This is explained in the next section.
+
 
 % subsection methods (end)
 
@@ -241,6 +208,8 @@ DCG is a measure of ranking quality. It is used to evaluate the ranking of retri
 
 \subsection{Analysis of Results} % (fold)
 \label{sub:analysis_of_results}
+
+TODO: Talk about time to rank
 Table 2 and 3 indicate the results of average precision, recall and F1 score of tests on algorithms with informational and navigational queries where informational queries include 'degree', 'jun wang' and 'alphago' and navigational queries inlcude 'moodle', 'computer graphical syllabus', 'bioinformatics home page' and 'information retrieval and data mining'  respectively. Algorithms include BM25, QueryLikelihood( QL), Boolean, TF-IDF, BM25 with Pagerank( BM25PG), TF-IDF with Pagerank( TF-IDFPG) and QL with Pagerank. There are totally about 100 links for each query and various number of relevant documents depending on the query.
 
 It can be seen that without consideration of result ranking, the BM25 has the leading performance with both informational and navigational query. This could because that the penalty on term frequency and document length that BM25 implements helps to avoid retrieving non-relevant documents. Also, it strikes to the eyes that algorithms implemented with page ranking are actually worse than them along. One possible reason is that page rank depends on the number of anchors to the objective page, which means the more pages pointing to the objective page, the higher page rank it will receive. However, in our experiment, relevant documents to our queries might not be more popular than the non-relevant ones, therefore the page rank( QLPG) would be a noise while the search engine predicting the relevance. Although more test sets would be required to determine whether the combination is worse than the individual model.
@@ -297,34 +266,34 @@ navigational& 13.4&10.1&7.4&na&8.6&7.4&10.9\\ \hline
 }
 \end{table}
 
-\begin{table}[!h]
+
+\textbf{TIME}
+
+\begin{table}[]
 \centering
 \caption{Time of queries with PageRank}
 \label{tab:time}
 \begin{tabular}{|l|l|}
 \hline
-        & Avg. Time  \\ \hline
-BM25            & 4.619 \\ \hline
-QueryLikelihood & 2.109\\ \hline
-TF-IDF          & 2.996\\ \hline
+        & Time  \\ \hline
+BM25            & 4.61880669593811 \\ \hline
+QueryLikelihood & 2.1089548110961913\\ \hline
+TF-IDF          & 2.9961967706680297\\ \hline
 \end{tabular}
 \end{table}
 
-\begin{table}[!h]
+\begin{table}[]
 \centering
 \caption{Time of queries without PageRank}
 \label{tab:time_pr}
 \begin{tabular}{|l|l|l|l|}
 \hline
-        & Avg. Time  \\ \hline
-BM25            & 4.012\\ \hline
-QueryLikelihood & 1.23\\ \hline
-TF-IDF          & 2.109 \\ \hline
+        & Time  \\ \hline
+BM25            & 4.011985206604004 \\ \hline
+QueryLikelihood & 1.2295216083526612\\ \hline
+TF-IDF          & 2.109076404571533 \\ \hline
 \end{tabular}
 \end{table}
-
-Another aspect to take into consideration when evaluating performance of an algorithm is the time taken to rank the documents. Table \ref{tab:time} and \ref{tab:time_pr} shows the average time of 10 query words of different lengths, both with and without PageRank. Firstly, we can observe that BM25 spends considerably more time than the others. It is hard to explain the exact reason why it is spending almost double the time, but it might be caused by some implementation issues where for example the database gets called more than usual. Query likelihood seems to perform better than TF-IDF overall as well. It can also be observed a small increase in the timing when applying PageRank to the queries. This can especially be seen for the query likelihood where the time was increased by 42\%.
-
 
 % subsection analysis_of_results (end)
 
@@ -346,5 +315,10 @@ During the evaluation we had a limitation in our test set. The test set could be
 \label{sec:conclusion}
 
 % section conclusion (end)
+
+\section{References} % (fold)
+\label{sec:references}
+
+% section references (end)
 
 
