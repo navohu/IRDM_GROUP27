@@ -173,7 +173,6 @@ where $f_{t,d}$ is the number of term occurrences within a document (TF), while 
 \label{ssub:BM25}
 
 BM25 is another type of ranking algorithm developed by Karen Sparck Jones. It is a newer and improved version of TF-IDF. The BM25 belongs to the probabilistic models and uses the "bag of words" concept for retrieving relevant documents from a given search query. The difference from TF-IDF is how BM25 treats the "TF" term. It adjusts the TF score by The formula to adjust the TF score based on the document length is as below where b and k are constants and L is the length of document:
-
 $$ score(D, Q) = \sum_{i=1}^n IDF(q_i) * \frac{f(q_i, D)* (k + 1)}{f(q_i, D) + k * (1-b + b * \frac{|D|}{avgdl})}$$
 
 where the IDF is defined as in subsection \ref{sub:tf_idf}. The same issue with the IDF term turning negative if a term is present in more than half of the document collection also occur for BM25. Hence, the adjustment of setting the IDF term to a small value was also implemented here.
@@ -182,6 +181,18 @@ where the IDF is defined as in subsection \ref{sub:tf_idf}. The same issue with 
 
 \subsubsection{Query Likelihood with Smoothing} % (fold)
 \label{ssub:query_likelihood_with_smoothing}
+
+Query likelihood is a probabilistic ranking method which is based on approximating the language model of a document, i.e. a probability distribution of each word appearing in its content. At its simplest, query likelihood ranks documents based on the probability of the query $Q$ of $k$ terms $\{q_1,q_2,...,q_k\}$ being produced from the language model $M_D$ of document $D$:
+
+\[ P(Q | M_D) = P(q_1,q_2,...,q_k | M_D) = \prod_{i=1}^{k} P(q_i | M_D)\]
+
+We used a unigram language model in the interest of storage required by the inverted index. A bi- or trigram model would have required an exponentially larger index to list each sequence of two, or three, words in the document. In our case, the distribution $M_D$ was modelled as the frequency of query term $q$ in the document $D$ as a fraction of the length of $D$:
+\[ M_D = P(q | D) = \frac{tf_{q,D}}{|D|} \]
+
+The problem with this maximum likelihood form is that due to the multiplication of the probabilities of individual terms, any query with even a single term not appearing in the document is assigned a probability of zero. This is not desirable any new word can also appear in the language model with a non-zero probability. This is particularly important for short documents with few words to begin with. In order to handle term frequencies of zero, this estimate must be expanded from a strict term frequency to a metric that also takes a form of background probability into account. The background probability, i.e. how often a word appears in the entire collection of documents $C$, is factored in using a smoothing parameter $\lambda$:
+\[P(q | D) = \lambda * \frac{tf_{q,D}}{|D|} + (1 - \lambda) * \frac{bg_{q,C}}{|C|}\]
+We used Jelinek-Mercer Smoothing, in which the parameter $\lambda$ is a constant. We identified $\lambda = 0.8$ as a good smoothing ratio, returning the most relevant results.
+
 
 % subsubsection query_likelihood_with_smoothing (end)
 
