@@ -2,37 +2,29 @@
 
 The end of the 20th century gave rise to a need to quickly obtain information on the web. As a result of this, search engines were developed and are one of the most common methods to find information online today. Competition between different search engines has been present since the start, but Google has long ruled the market. Its has become widely used because its algorithms have outperformed those of other search engines. Not all of the algorithms that Google is using are publicly available, but those that are known have been present through decades, such as TF-IDF, BM25, PageRank and query likelihood ranking.
 
-The aim of this report is to explore existing algorithms for information retrieval and how they perform against each other. The search engine was implemented on the "cs.ucl.ac.uk" domain and includes several preprocessing techniques and data transformations. The application includes implementations of several ranking algorithms and an evaluation of the results. The search engine application built for this project can be found on \url{github.com/navohu/IRDM_GROUP27} and has been implemented in Python.\footnote{All instructions for running the application can be found in the README file in the repository.} Initially, our expectations for the project were to produce results that showed the difference of the current working algorithms, as well as an implementation of a deep learning algorithm. Since our project only included a search on the CS website it would imply that the amount of data might not be sufficient for a deep learning approach.
+The aim of this report is to explore existing algorithms for information retrieval (IR) and how they perform against each other. To evaluate these algorithms in a tractable sized test environment, we implemented a search engine on the "cs.ucl.ac.uk" domain. The application includes implementations of several ranking algorithms, a variety of preprocessing techniques and data transformations as well as an evaluation of the results. The search engine application built for this project was implemented in Python and can be found on \url{github.com/navohu/IRDM_GROUP27}.\footnote{All instructions for running the application can be found in the README file of the repository.} Initially, our expectations for the project were to produce results that showed the difference of the current working algorithms, as well as an implementation of a deep learning algorithm. However, since our project only included a search on the CS domain and our test set is limited in size, the amount of data might not be sufficient for a deep learning approach.
 
-
-
-TODO: Our results ... compare the different ranking algorithms with and without PageRank. Explain what metric showed the best results.
-
-
-This report will first explain different discoveries within the field of information retrieval, followed by an experiment section. This section will explore the methodology of how we created the search engine like setting up an inverted index, programming the crawler and implementing the algorithms. After the methodology section we will introduce the evaluation methods and metrics we used. Finally, we will analyse our results and provide a discussion about the project and its limitations.
+This report will first discuss influential related work within the field of information retrieval. It will then move on to describe the methodology involved in creating the search engine: steps such as setting up an inverted index, programming the crawler and implementing the algorithms. After the methodology section we will introduce the methods and metrics we used in evaluating our algorithms. Finally, we will analyse our results and provide a discussion about the project, its limitations and potential expansions.
 
 
 \section{Related Work}
 Retrieving and ranking results in a search engine can be done through many different algorithms. In this section, we will explore the literature covering two categories of ranking algorithms: probabilistic and non-probabilistic. We will then investigate how the performance of an algorithm is commonly evaluated given a test set. Furthermore, we will review Deep Learning, a new topic that has caught attention within information retrieval, and how it can be used in search engines.
 
-Today, web search is a tool that individuals, universities and businesses use on a daily basis. Many of these retrieval systems fall under traditional information retrieval (IR). The first web search engine was created in 1993, but soon the renowned search engine Google was created by Larry Page and Sergey Brin. The feature that made Google better than its competitors was an algorithm called PageRank introduced by Page in 1998 \cite{brin1998anatomy}. He describes PageRank as "an objective measure of [a website's] citation importance that corresponds well with people's subjective idea of importance." This ranking algorithm is still used by Google today.
+Today, web search is a tool that individuals, universities and businesses use on a daily basis. Many of these retrieval systems fall under traditional information retrieval. The first web search engine was created in 1993, but soon the renowned search engine Google was created by Larry Page and Sergey Brin. The feature that made Google better than its competitors was an algorithm called PageRank introduced by Page in 1998 \cite{brin1998anatomy}. He describes PageRank as "an objective measure of [a website's] citation importance that corresponds well with people's subjective idea of importance." This ranking algorithm is still used by Google today.
 
 Another method of ranking the importance of a website was developed by Kleinberg in 1999 \cite{kleinberg1999authoritative}. He proposed a link analysis algorithm called HITS. It involves identifying hubs and authorities in a web graph, where hubs serve as large directories without specific authoritative information, while authorities hold important information. % TODO: clarify?
 
-Both PageRank and HITS are algorithms that rank the importance of a page, but do not take a query into consideration.
-% TODO: clarify the sentence below
-Hence, these algorithms are good for ranking the difference between results returned by algorithms that take the query into consideration.
-Within query-dependent rankers, one of the earliest and simplest non-probabilistic algorithms was the Standard Boolean model introduced by Fayen \cite{lancaster1973information}. Since this algorithm is based on an exact match between the query terms and the document content, it will often either return too many or too few documents. This simple model was improved upon with more sophisticated algorithms such as the Vector Space Model \cite{salton1975vector}, Term Frequency -- Inverse Document Frequency (TF-IDF) \cite{salton1983mcgill}, and query likelihood language models \cite{zhai2001model} among others. They all have a goal of retrieving the most relevant documents for a given query. \\
+Both PageRank and HITS are algorithms that rank the importance of a page, but do not take a query into consideration. Hence, these algorithms are good for supplementing rankings returned by algorithms that take the query into consideration. Within query-dependent rankers, one of the earliest and simplest non-probabilistic algorithms was the Standard Boolean model introduced by Fayen \cite{lancaster1973information}. Since this algorithm is based on an exact match between the query terms and the document content, it will often either return too many or too few documents. This simple model was improved upon with more sophisticated algorithms such as the Vector Space Model \cite{salton1975vector}, Term Frequency -- Inverse Document Frequency (TF-IDF) \cite{salton1983mcgill}, and query likelihood language models \cite{zhai2001model} among others. They all have a goal of retrieving the most relevant documents for a given query. \\
 
 IR research has always had a strong emphasis on measuring the efficacy of an IR system. This includes estimating the relevance of documents retrieved by a search engine relative to the user's information need. Evaluation is important in order to assess the performance of the system, measure the differences of multiple systems, and to learn the faults of a system such that IR methods can be improved in the future. The Text Retrieval Conference (TREC) supports and influences the IR community by providing evaluation infrastructure. The famous infrastructure for evaluation, trec\_eval, is used for all ad hoc tasks in TREC \cite{voorhees:evaluation}. Two of its measurements are precision and recall, first developed by Sparck-Jones \cite{jones1981information}. This type of evaluation is based on a document collection that includes documents classified as relevant or non-relevant, based on a set of queries.
 
 On the other hand, work on IR evaluation has shown that defining relevance is very hard when it comes to "real" users \cite{mizzaro1997relevance}. Therefore, another method of capturing user interactions with a search engine is Transaction Log Analysis (TLA). It is based on creating transaction logs to recognise attributes within the search process. It's a way of measuring the searcher's actions, the interaction between the user and the system along with the results \cite{glaser1967discovery}. 
 
-Having a stable and robust test collection is an important part of evaluation. This has resulted in a connected community where researchers have shared test collections with each other. Mark Sanderson emphasises the power of good test collections used in conjunction with evaluation measures \cite{sanderson:evaluation}. Evaluation methods used by Sanderson include Discounted Cumulative Gain (DCG) and normalised DCG (nDCG). DCG is often used to measure the ranking quality and the effectiveness of web-based search engines specifically. The algorithm measures the \textit{gain} of a document based on its position in the list. nDCG normalises the gain across queries, which is done by sorting the relevant documents by their relative relevance.
+Having a stable and robust test collection is an important part of evaluation. This has resulted in a connected community where researchers have shared test collections with each other. Mark Sanderson emphasises the power of good test collections used in conjunction with evaluation measures \cite{sanderson:evaluation}. Evaluation methods used by Sanderson include Discounted Cumulative Gain (DCG) and normalised DCG (nDCG). DCG is often used to measure the ranking quality and the effectiveness of web-based search engines specifically. The algorithm measures the \textit{gain} of a document based on its position in the list. nDCG normalises the gain across queries by sorting the relevant documents by their relative relevance. \\
 
-The very popular subject Deep Learning has also been used in web search engines. Huang, PS. \emph{et al.} proposes a deep structured semantic model that is trained by trying to reach the maximum conditional likelihood of a clicked document given a query \cite{huang2013learning}. The idea is based on click-through data collected which is used to feed the model in order to learn which pages are relevant to a query. Another paper by Deng, L. \emph{et al.} used deep stacking networks (DNS) in order to perform a parallel and scalable relevance prediction on an IR task \cite{deng2013deep}. It outperforms previous well known machine learning ranking algorithms such as LambdaRank and LambdaMART \cite{burges2010ranknet} in normalised DCG. 
+The very popular subject Deep Learning has also been used in web search engines. Huang et al. propose a deep structured semantic model that is trained by trying to reach the maximum conditional likelihood of a clicked document given a query \cite{huang2013learning}. The idea is based on click-through data collected which is used to feed the model in order to learn which pages are relevant to a query. Another paper by Deng et al. used deep stacking networks (DNS) in order to perform a parallel and scalable relevance prediction on an IR task \cite{deng2013deep}. It outperforms previous well known machine learning ranking algorithms such as LambdaRank and LambdaMART \cite{burges2010ranknet} in normalised DCG. 
 
-Many of these algorithm are commonly used in web search today and the rest of the report will explore how some of these techniques can be used in a search engine. A comparison between different methods will also be provided.
+%Many of these algorithms are commonly used in web search today and the rest of the report will explore how some of these techniques can be used in a search engine. A comparison between different methods will also be provided.
 
 
 % section related_work (end)
@@ -41,14 +33,14 @@ Many of these algorithm are commonly used in web search today and the rest of th
 \section{Experiments} % (fold)
 \label{sec:experiment}
 
-This section will present the overall methodology of building a search engine. Our methodology is freely and easily adaptable since it uses open source Python libraries and free-tier instances of Amazon Web Services Elastic Compute Cloud (EC2) and Relational Database Service (RDS). There are five main algorithms that have been implemented and contrasted in this project: Boolean Retrieval, TF-IDF, BM25, query likelihood estimation and PageRank. The assortment of algorithms was chosen after a thorough examination of the current literature in the field. We wanted to both test algorithms that have been shown to be very accurate and include some that are less advanced in order to provide a full overview of the the most known algorithms in the field, and cover the main differences between them. 
+This section will present our overall methodology in building a search engine. Our methodology is freely and easily adaptable since it uses open source Python libraries and free-tier instances of Amazon Web Services Elastic Compute Cloud (EC2) and Relational Database Service (RDS). There are five main algorithms that have been implemented and contrasted in this project: Boolean Retrieval, TF-IDF, BM25, query likelihood estimation and PageRank. The assortment of algorithms was chosen after a thorough examination of the current literature in the field. We wanted to both test algorithms that have been shown to be very accurate and include some that are less advanced in order to provide a full overview of the the most known algorithms in the field, and cover the main differences between them. 
 
 \subsection{Dataset Description} % (fold)
 \label{sub:dataset_description}
 
-The search engine is dealing with two core datasets: the crawled web pages and the test set for evaluation. The crawled web pages are specifically modified and transformed for use. Examples of this include creating an inverted index based on the content of the crawled web pages or producing an adjacency matrix based on the relationship between pages.
+The search engine is dealing with two core datasets: the crawled web pages and the test set for evaluation. The crawled web pages are specifically modified and transformed for use. Examples of this include creating an inverted index based on the content of the crawled web pages or producing an adjacency matrix based on the relationship between pages. 
 
-The test set was manually created in order for us to evaluate the performance of our search engine. Two main test sets were created: one for navigational use, and one for informational use. This means that one test set is specifically created such that the user want \emph{one} specific document (navigational), while the other test set is created to retrieve as many relevant documents as possible (informational). Both test sets included queries and relevant documents related to the queries (so that recall can be calculated). The composition of each test dataset is shown in Table \ref{dataset-table}, and the test sets in their entirety can be found in the \emph{queries} subfolder of our GitHub repository.  A justification for the choice of test queries follows in section \ref{ssub:evaluation_queries}.
+The test set was manually created in order for us to evaluate the performance of our search engine. Two main categories were produced: one with navigational queries and another with informational queries. This means that the first set is specifically made up of queries where the user is looking for \emph{one} specific document (navigational), while the other set is created with the intention of measuring the capability of the search to retrieve as many relevant documents as possible (informational). Both test sets included queries as well as relevant documents related to the queries so that recall can be calculated. The composition of each test dataset is shown in Table \ref{dataset-table}, and the test sets in their entirety can be found in the \emph{queries} subfolder of our GitHub repository.  A justification for the choice of queries follows in section \ref{ssub:evaluation_queries}.
 
 \begin{table}[H]
 \centering
@@ -61,12 +53,12 @@ The test set was manually created in order for us to evaluate the performance of
 Query & Total labels & Relevant & Non-relevant \\ \hline
 \textbf{Informational} \\ \hline
 degree & 152 & 87 & 65 \\ \hline 
-Jun Wang & 101 & 30 & 65 \\ \hline
-alphaGO & 30 & 26 & 4 \\ \hline
+Jun Wang & 101 & 30 & 71 \\ \hline
+alphaGO & 30 & 4 & 26 \\ \hline
 \textbf{Navigational} \\ \hline
 moodle & 69 & 2 & 67 \\ \hline
 information retrieval and data mining & 96 & 62 & 34 \\ \hline
-computer graphics syllabus & 119 & 44 & 75\\ \hline
+computer graphics syllabus & 119 & 75 & 44\\ \hline
 bioinformatics home page & 69 & 36 & 33 \\ \hline
 \end{tabular}%
 }
@@ -94,7 +86,7 @@ Based on these URLs, an inverted index is created, consisting of a dictionary th
 \subsubsection{Crawling} % (fold)
 \label{ssub:crawling}
 
-The crawling was done through an open source platform called Scrapy written in Python.\footnote{https://scrapy.org} This platform is given a start URL "\url{www.cs.ucl.ac.uk}", followed by a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. This would include pages such as "\url{www.cs.ucl.ac.uk/home}", and "\url{www.wiki.cs.ucl.ac.uk}". We set a \emph{maximum depth} of the crawler because we found some links that were extremely long only contained parts of the internal index of the CS website that were practically never opened by visitors to the website. The crawler also made sure not to crawl already crawled links. In the graph in Figure \ref{fig:graph} we can see an example where some links are pointing back to the root. These links would therefore not be crawled again.
+The crawling was done through an open source platform called Scrapy written in Python.\footnote{https://scrapy.org} This platform is given a start URL "\url{www.cs.ucl.ac.uk}", on the outgoing links of which it performs a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. This would include pages such as "\url{www.cs.ucl.ac.uk/home}", and "\url{www.wiki.cs.ucl.ac.uk}". We set a \emph{maximum depth} of the crawler because we found some links that were extremely long only contained details of the internal index of the CS website that were practically never opened by visitors to the website. The crawler also made sure not to crawl already crawled links. In the graph in Figure \ref{fig:graph} we can see an example where some links are pointing back to the root. These links would therefore not be crawled again.
 
 \begin{figure}[!h]
 \centering
@@ -116,14 +108,18 @@ The crawling was done through an open source platform called Scrapy written in P
 \label{fig:graph}
 \end{figure}
 
-The elements that were crawled from the website were the urls, titles ($<$h1$>$ tags) and the anchor text. This information, along with a unique identifier, was stored in the table \emph{cs\_sites}. We didn't crawl and store the content of the pages because of storage limitations. As long as all links of the domain are contained in the database, it is easy to access the content of each page at the indexing stage.
+The elements that were fetched from the websites were the URLs, titles ($<$h1$>$ tags) and the anchor text. This information, along with a unique identifier, was stored in the table \emph{cs\_sites}. We didn't crawl and store the content of the pages because of storage limitations. As long as all links of the domain are contained in the database, it is easy to access the content of each page at the indexing stage.
 
 % subsubsection crawling (end)
 
 \subsubsection{Inverted Index} % (fold)
 \label{ssub:inverted_index}
 
-To map each word to the IDs of documents it appears in, and then reduce that set of pairs by counting the frequency of each pair, we used Apache Spark, an open-source big data processing framework based on the MapReduce paradigm. In this way, we were able to parallelise the computation-heavy task of retrieving the content of each website, pre-processing its terms and aggregating the results before writing them to the database. We ran Spark on the EC2 server as well as on an Elastic MapReduce cluster with two worker nodes for increased throughput.
+We constructed an inverted index mapping each word to the documents it is contained in. The index also contains frequency information, meaning how many times a word occurs in each document. In the interest of reducing storage requirements, we used unigram index terms. A bi- or trigram model would have required an exponentially larger index to list each sequence of two, or three, words in the document.
+
+To make the indexed terms as generalisable as possible, we filtered out the most common words in the English language using the \emph{stopwords} module of the Python natural language toolkit NLTK. This left out words such as "and" and "it", which are of low relevance in describing the content of the document. We also applied Porter stemming \cite{porter1980algorithm} on the index terms so that words with the same stem, such as "computer", "computers", and "computational", could be treated as the same entity, "comput". In case we wanted to retrieve the original terms and include the stopwords, we also added an analogous \emph{raw} index for which we omitted the pre-processing steps stopping and stemming. \\
+
+To map each indexed term to the IDs of documents it appears in, and then reduce that set of pairs by counting the frequency of each pair, we used Apache Spark, an open-source big data processing framework based on the MapReduce paradigm. In this way, we were able to parallelise the computation-heavy task of retrieving the content of each website, pre-processing its terms and aggregating the results before writing them to the database. We ran Spark on the EC2 server as well as on an Elastic MapReduce cluster with two worker nodes for increased throughput. The added computing speed and parallelism enabled by Spark would have been of particular importance had we indexed the entire UCL domain; however, its Resilient Distributed Dataset operations proved well suited for the task of building an inverted index regardless of scale.
 
 %Explain the columns that were added to the cs\_sites table
 
@@ -134,7 +130,7 @@ To map each word to the IDs of documents it appears in, and then reduce that set
 
 The ranking algorithms we applied on the inverted index can roughly be divided into two categories: standalone rankers and query-insensitive supplementary metrics. In the standalone category, we implemented Boolean retrieval, TF-IDF, BM25 and Query Likelihood ranking. In addition, we added an option to include PageRank scoring to augment the ranking of each of the former algorithms. PageRank itself belongs to the latter supplementary category, since it can not be directly used to retrieve results for a query, as it does not take query terms into consideration and depends on page features only.
 
-All of the standalone algorithms can be run within our app, with or without PageRank. In this way, differences in results returned by the algorithms and their respective ranks can be quickly noticed. A more systematic approach to measure the performance of the different ranking algorithms is through proper evaluation. This is explained in the next section.
+All of the standalone algorithms can be run within our app, with or without PageRank. In this way, differences in results returned by the algorithms and their respective ranks can be quickly noticed. A more systematic approach to measure the performance of the different ranking algorithms is through proper evaluation. Section \ref{sub:metrics_&_analysis} will introduce our evaluation framework.
 
 
 \subsubsection{PageRank} % (fold)
@@ -142,10 +138,13 @@ All of the standalone algorithms can be run within our app, with or without Page
 
 The popular algorithm PageRank was developed by Google for ranking the results within a search engine.\footnote{https://en.wikipedia.org/wiki/PageRank} It is also commonly used for measuring the importance of a website. The algorithm is based on an assumption that more important websites are more likely to be pointed to from other websites.
 
-The algorithm implies that it would need a way of representing connections between web sites. This can easily be done with the aid of an adjacency matrix. Firstly, all the connections needed to be measured, which was done by obtaining all the outgoing links for each site in \emph{cs\_sites}. Now, each link would point to a certain number of outgoing links disregarding whether they were in the \emph{cs.ucl.ac.uk} domain or not, but were filtered to eventually only hold links within the CS domain. From these connections an adjacency matrix was produced as shown as an example in Table \ref{fig:adj_mx}. 
+It follows that PageRank needs a way of representing connections between web sites. This can easily be done with the aid of an adjacency matrix. Firstly, all the connections needed to be measured, which was done by obtaining all the outgoing links for each site in \emph{cs\_sites}. At this stage, each page pointed to a certain number of other websites,
+%regardless of whether they were in the \emph{cs.ucl.ac.uk} domain or not, but were
+which we filtered down to links within the CS domain only. From these connections, an adjacency matrix was produced, an example of which is shown in Table \ref{fig:adj_mx}. 
 
-\begin{table}[!h]
+\begin{table}[!t]
   \centering
+  \caption{Adjacency matrix between links A, B and C. The number 1 represents a connection, while 0 represents no connection.}
   \begin{tabular}{|lr|c|c|c|} \cline{3-5}
   \multicolumn{1}{l}{} && \multicolumn{3}{c|}{To} \\ \cline{3-5}
   \multicolumn{1}{l}{} & & A & B & C  \\ \hline
@@ -155,15 +154,14 @@ The algorithm implies that it would need a way of representing connections betwe
   & \multicolumn{1}{|r|}{B} & 0 & 1 & 1  \\ \cline{2-5}
   & \multicolumn{1}{|r|}{C} & 1 & 1 & 0  \\ \hline
   \end{tabular}
-  \caption{Adjacency matrix between links, where A, B and C represents links. The number 1 represents a connection, while 0 represents no connection.}
   \label{fig:adj_mx}
 \end{table}
 
-The adjacency matrix was then used in the PageRank algorithm to compute the rank of each link. The implementation would first convert the adjacency matrix into a markov matrix, followed by computing the rank of state \emph{i}:
+A random walk was then performed over the websites according to the adjacency matrix. The implementation first converted the adjacency matrix into a Markov matrix representing outgoing transition probabilities. This was followed by computing the rank of state (i.e. page) \emph{i}:
 
-$$ r_i = r_{i-1} \cdot (I_i *s + S_i * s + T_i * (1-s)) $$ 
+$$ r_i = r_{i-1} \cdot (I_i *s + S * s + T * (1-s)) $$ 
 
-where \emph{r} is the PageRank, \emph{$I_i$} is the inlinks of state \emph{i}, \emph{$S_i$} are the sink states, \emph{$T_i$} is the teleporting state and \emph{s} is the probabillity of following a transitions. That means that \emph{s-1} is the probability of teleporting. We have set $s=.85$. The algorithm will continue to calculate \emph{$r_i$} until it reaches a value below the maxerr rate ($maxerr = 0.001$). It is then said to be converged. 
+where \emph{r} is the PageRank, \emph{$I_i$} are the inlinks of state \emph{i}, \emph{$S$} are the sink states, \emph{$T$} are the states with a chance of teleporting to $i$ and \emph{s} is the probabillity of following a hyperlink transition. That means that \emph{s-1} is the probability of teleporting. We have set $s=.85$. The algorithm will continue to calculate \emph{$r_i$} until it reaches a value below the maxerr rate ($maxerr = 0.001$). It is then said to have converged. 
 
 The PageRank is then used in our search engine to rank the differences between similar documents. If two documents showed to have very similar ranks produced, the PageRank weighting can be a useful metric that can give an extra weight to each ranked document. It will then be clearer which documents are more appropriate and most likely more visited. 
 
@@ -173,7 +171,7 @@ The PageRank is then used in our search engine to rank the differences between s
 \subsubsection{Boolean Retrieval} % (fold)
 \label{ssub:boolean_retrieval}
 
-Boolean retrieval is a simple ranking algorithm that checks for the presence of query terms in a document. A boolean query can be built up with connectors AND, OR and NOT. All documents that contain terms connected by AND, one or more terms connected by OR, and no terms preceded by NOT, are returned. We implemented Basic Boolean retrieval, in which no distinction in relevance is made between the matching documents. In this model, a document with just one mention of each search term is equally likely to appear at the top of the results as one having a high frequency of the terms. Due to its simplicity, this method serves as a performance baseline to which more advanced algorithms can be compared.
+We also implemented Boolean retrieval, a simple ranking algorithm that checks for the presence of query terms in a document. A boolean query can be built up with connectors AND, OR and NOT. All documents that contain terms connected by AND, one or more terms connected by OR, and no terms preceded by NOT, are returned. We implemented Basic Boolean retrieval, in which no distinction in relevance is made between the matching documents. In this model, a document with just one mention of each search term is equally likely to appear at the top of the results as one having a high frequency of the terms. Due to its simplicity, this method serves as a performance baseline to which more advanced algorithms can be compared.
 
 To ensure compatibility between search engine interfaces and comparability of results, we implemented the Basic Boolean model using free text queries instead of a boolean syntax. This means that all natural language queries are considered AND queries. It would not have made sense to compare the results of a "software OR vision AND NOT robot" query to any free text query fed into our remaining models, which is why limiting the connectors to AND is sufficient in this case.
 % subsubsection boolean_retrieval (end)
@@ -181,20 +179,23 @@ To ensure compatibility between search engine interfaces and comparability of re
 \subsubsection{TF-IDF} % (fold)
 \label{sub:tf_idf}
 
-TF-IDF is a type of ranking algorithm that is based off of reflecting how important a certain word is within a document in a collection. Normally, it is used as a weighting factor but can also be used for pure ranking given a query term. It consists of two main concepts:  term frequency (TF) and inverse document frequency (IDF). The two terms have been implemented in the search engine using these equations:
+TF-IDF is a type of ranking algorithm that is based on reflecting the importance of a certain word within a document in a collection. Normally, it is used as a weighting factor but can also be used for pure ranking given a query term. It consists of two main concepts:  term frequency (TF) and inverse document frequency (IDF). The two terms have been implemented in the search engine using these equations:
 
-$$TF = \frac{f_{t,d}}{\sum\limits_{t' \in d} f_{t,d}}$$
+$$TF(t,d) = \frac{f_{t,d}}{\sum\limits_{t' \in d} f_{t',d}}$$
 
-$$IDF = log_2 \frac{N}{n_t}$$
+$$IDF(t) = log_2 \frac{N}{n_t}$$
 
-where $f_{t,d}$ is the number of term occurrences within a document (TF), while the summation is the length of the document. \emph{N} is the number of documents in collection and $n_t$ is the term frequency in the collection. An important notice is that if a term is appearing in more than half of the corpus documents, the IDF would become negative and impossible to interpret against other positive documents. As a result of this drawback we decided to turn all negative values into a small value like $\alpha = 0.001$ in order for the app to compare all the results against each other. All of these terms were retrieved from our database. The documents would then be ranked based on the product of $TF * IDF$ and will display all the documents in descending order. 
+where $f_{t,d}$ is the number of term occurrences within a document (TF), while the summation over $d$ is the length of the document. \emph{N} is the number of documents in collection and $n_t$ is the term frequency in the collection. The document and collection-wide term frequencies $f_{t,d}$ and $n_t$ were computed in advance and are retrieved from our database at runtime. The documents are then ranked based on the product of $TF * IDF$ and displayed in descending order.
+
+An important thing to note is that if a term appears in more than half of the corpus documents, its IDF becomes negative and impossible to interpret against other positive documents. In our dataset, this was the case for words such as "computer" and "science". To work around this issue and for the app to be able to compare all results against each other, we decided to set a minimal boundary of 0.001 for IDF values.
 
 % subsection tf_idf (end)
 
 \subsubsection{BM25} % (fold)
 \label{ssub:BM25}
 
-BM25 is another type of ranking algorithm developed by Karen Sparck Jones. It is a newer and improved version of TF-IDF. The BM25 belongs to the probabilistic models and uses the "bag of words" concept for retrieving relevant documents from a given search query. The difference from TF-IDF is how BM25 treats the "TF" term. It adjusts the TF score by The formula to adjust the TF score based on the document length is as below where b and k are constants and L is the length of document:
+BM25 is another type of ranking algorithm developed by Karen Sparck Jones. It is a newer and improved version of TF-IDF. The BM25 belongs to the probabilistic models and uses the "bag of words" concept for retrieving relevant documents for a given search query. It differs from TF-IDF in how it handles TF. It adjusts the TF score by % TODO: something's missing here
+The formula to adjust the TF score based on the document length is as below where b and k are constants and L is the length of document:
 $$ score(D, Q) = \sum_{i=1}^n IDF(q_i) * \frac{f(q_i, D)* (k + 1)}{f(q_i, D) + k * (1-b + b * \frac{|D|}{avgdl})}$$
 
 where the IDF is defined as in subsection \ref{sub:tf_idf}. The same issue with the IDF term turning negative if a term is present in more than half of the document collection also occur for BM25. Hence, the adjustment of setting the IDF term to a small value was also implemented here.
@@ -204,11 +205,11 @@ where the IDF is defined as in subsection \ref{sub:tf_idf}. The same issue with 
 \subsubsection{Query Likelihood with Smoothing} % (fold)
 \label{ssub:query_likelihood_with_smoothing}
 
-Query likelihood (QL) is a probabilistic ranking method which is based on approximating the language model of a document, i.e. a probability distribution of each word appearing in its content. At its simplest, QL ranks documents based on the probability of the query $Q$ of $k$ terms $\{q_1,q_2,...,q_k\}$ being produced from the language model $M_D$ of document $D$:
+Query likelihood (QL), the final algorithm we included, is a probabilistic ranking method which is based on approximating the language model of a document, i.e. a probability distribution of each word appearing in its content. At its simplest, QL ranks documents based on the probability of the query $Q$ of $k$ terms $\{q_1,q_2,...,q_k\}$ being produced from the language model $M_D$ of document $D$:
 
 \[ P(Q | M_D) = P(q_1,q_2,...,q_k | M_D) = \prod_{i=1}^{k} P(q_i | M_D)\]
 
-We used a unigram language model in the interest of storage required by the inverted index. A bi- or trigram model would have required an exponentially larger index to list each sequence of two, or three, words in the document. In our case, the distribution $M_D$ was modelled as the frequency of query term $q$ in the document $D$ as a fraction of the length of $D$:
+In our case, the distribution $M_D$ was modelled as the frequency of query term $q$ in the document $D$ as a fraction of the length of $D$:
 \[ M_D = P(q | D) = \frac{tf_{q,D}}{|D|} \]
 
 The problem with this maximum likelihood form is that due to the multiplication of the probabilities of individual terms, any query with even a single term not appearing in the document is assigned a probability of zero. This is not desirable any new word can also appear in the language model with a non-zero probability. This is particularly important for short documents with few words to begin with. In order to handle term frequencies of zero, this estimate must be expanded from a strict term frequency to a metric that also takes a form of background probability into account. The background probability, i.e. how often a word appears in the entire collection of documents $C$, is factored in using a smoothing parameter $\lambda$:
@@ -223,14 +224,14 @@ We used Jelinek-Mercer Smoothing, in which the parameter $\lambda$ is a constant
 \subsection{Evaluation Metrics} % (fold)
 \label{sub:metrics_&_analysis}
 
-The choice of evaluation metrics is central in measuring retrieval performance. A suitable metric quantifies how well the results of the algorithms conform with expected values. The most common metrics in evaluation within information retrieval are precision, recall and the F1 score. These three are the main evaluation methods used within this project. We have also reported Discounted Cumulative Gain (DCG). Each method will be explained in detail in the following subsections. The evaluation is performed on all the ranking algorithms: Boolean retrieval, TF-IDF, BM25 and query likelihood, both in the case of using PageRank and the case without PageRank.
+The choice of evaluation metrics is central in measuring retrieval performance. A suitable metric quantifies how well the results of the algorithms conform to expected values. The most common metrics in evaluation within information retrieval are precision, recall and the F1 score. These three are the main evaluation methods used within this project. We have also reported Discounted Cumulative Gain (DCG). How we calculated each metric will be explained in detail in the following subsections. The evaluation is performed on all ranking algorithms: Boolean retrieval, TF-IDF, BM25 and query likelihood, both in the case of using PageRank and the case without PageRank.
 
 \subsubsection{Queries}
 \label{ssub:evaluation_queries}
 Commonly, there are three types of search queries people type into a search engine: \emph{informational queries}, \emph{navigational queries} and \emph{transactional queries}.
-Informational queries are normally defined as queries that give the user information about a certain topic, such as a specific place, person, items etc. These queries are normally used when the user is looking for a wider range of information related to the query rather than a specific website. Hence, a greater number of relevant documents should be retrieved by the informational queries than the transactional and navigational queries. Our test set includes a numerous of these informational queries. We chose the queries by varying levels of generality such that we could compare the performances of engines with more specific queries as well as more general queries.
+Informational queries are normally defined as queries that give the user information about a certain topic, such as a specific place, person, items etc. These queries are normally used when the user is looking for a wider range of information related to the query rather than a specific website. Hence, a greater number of relevant documents should be retrieved by the informational queries than the transactional and navigational queries. Our test set includes 3 informational queries: "degree", "Jun Wang" and "alphaGO". We chose these queries due to their varying levels of generality such that we could compare the performance of algorithms on more specific queries as well as more general ones.
 
-Navigational queries are frequently used when someone is trying to find a certain website or portal. For example, a user might enter 'Facebook' into the search bar to find the Facebook website rather than directly entering the url into the browser's navigational bar. Therefore, the navigational results should be ranked on the top for this kinds of queries. However, queries can be ambiguous, in which case they could be interpreted as either navigational or informational. For example, users who search for 'Facebook' might actually be looking for news of Facebook. We decided to use 'Moodle', 'bioinformatics home page' and 'computer graphics syllabus' to represent navigational queries on the CS website.
+Navigational queries are frequently used when trying to find a certain website or portal. For example, a user might enter 'Facebook' into the search bar to find the Facebook website rather than directly entering the URL into the browser's navigational bar. Therefore, the navigational results should be ranked on the top for this kinds of queries. However, queries can be ambiguous, in which case they could be interpreted as either navigational or informational. For example, users who search for 'Facebook' might actually be looking for news of Facebook. We decided to use "Moodle", "bioinformatics home page" and "computer graphics syllabus" and "information retrieval and data mining" to represent navigational queries on the CS website.
 
 A transactional query shows an intent to complete a transaction, e.g. making a purchase or paying fees. We omitted this query category from our test set since it did not seem appropriate for our domain.
 
@@ -241,22 +242,21 @@ Recall is the ratio between the number of relevant documents retrieved by the se
 
 \[recall=\frac{|relevant\ documents\cap retrieved\ documents|}{|relevant\ documents|}\]
 
-However, it does not make sense to pursue 100\% recall by returning all documents in response to every query. Therefore, recall alone is not good enough and instead one also needs to measure the non-relevant document retrieved. Precision is a good supplementary metric for exactly this. It measures the ratio between the number of relevant documents retrieved and the total number of document retrieved by the search engine. The formula for precision is shown as below:
+However, it does not make sense to pursue 100\% recall by returning all documents in response to every query. Therefore, recall alone is not good enough and instead one also needs to measure the non-relevant document retrieved. Precision is a good supplementary metric for exactly this. It measures the ratio between the number of relevant documents retrieved and the total number of document retrieved by the search engine. Precision is calculated as follows:
 
 \[precision=\frac{|relevant\ documents\cap retrieved\ documents|}{| retrieved\ documents |}\]
 
-The F1 score is a good measure for the accuracy of the results of the given search engine. It considers both precision and recall of the test to compute the score. The general formula of the F1 score is as follow:
+The F1 score, on the other hand, is a good single measure for the accuracy of the results of the given search engine. It considers both precision and recall when computing its score. The general formula of the F1 score is shown below:
 
 \[F1=(1+\beta^{2})\cdot \frac{precision\cdot recall}{(\beta^{2}\cdot precision)+recall}\]
 
-In our experiment, we would set the parameter to be the traditional value 0.5, and therefore the formula would become this:
+In our experiment, we set the parameter $\beta$ to the conventional value 0.5, changing the formula to become as follows:
 
 \[F1=2\cdot \frac{precision \cdot recall}{precision+recall}\]
 
 \subsubsection{Discounted Cumulative Gain (DCG)}
 
-DCG is a measure of ranking quality. It is used to evaluate the ranking of retrieved documents based on their position in the result list. The gain is accumulated from the top of the list to the bottom with the gain of each result discounted at lower ranks. The higher the DCG value is, the better the ranking is, meaning that more relevant documents are displayed on top of the results list. The formula is as follow:
-
+DCG is a further measure of ranking quality. It is used to evaluate the ranking of retrieved documents based on their position in the result list. The gain is accumulated from the top of the list to the bottom with the gain of each result discounted at lower ranks. The higher the DCG value is, the better the ranking is, meaning that more relevant documents are displayed on top of the results list. In equation form, DCG is defined as follows:
 \[DCG_{k}=\sum_1^k \frac{2^{rel_{i}}-1}{log_{2}(i+1)}\]
 
 % subsection metrics_&_analysis (end)
@@ -382,7 +382,7 @@ Because of time restrictions, we also had to leave out a deep learning based ran
 \section{Conclusion} % (fold)
 \label{sec:conclusion}
 
-From our results, it can be concluded that our model behaves in a desirable way. It successfully retrieves relevant documents to our queries and BM25 managed to achieve precision results up to 70\%, as well as recall results up to 62\%. The goal of the project was to rank and compare different models, which has been achieved through both crawling, indexing and implementing five main algorithms. The four algorithms Boolean Retrieval, TF-IDF, BM25, Query Likelihood behaved in an expected manner according to previous work in the field. One surprising conclusion from the results was how PageRank didn't add any value to retrieving relevant documents, but instead decreased both precision and recall values for all the ranking algorithms. 
+From our results, it can be concluded that our search engine behaves in a desirable way. It successfully retrieves relevant documents to our queries and BM25 managed to achieve precision results up to 70\%, as well as recall results up to 62\%. The goal of the project was to rank and compare different models, which has been achieved through both crawling, indexing and implementing five main algorithms. The four algorithms Boolean Retrieval, TF-IDF, BM25, Query Likelihood behaved in an expected manner according to previous work in the field. One surprising conclusion from the results was how PageRank didn't add any value to retrieving relevant documents, but instead decreased both precision and recall values for all the ranking algorithms. 
 
 For future work we believe our deep learning assisted ranking could have been a novel contribution to the problem of IR, as no other model is likely to be built up of exactly our choice of features, and converge on the exact same weights in the training process, especially given our original test set. However, one limitation that would have made an application of deep learning difficult in our case was the manually defined set of test queries. When training a large neural network for the general task of ranking search results, a large amount of data is needed to achieve comparable performance on an unseen test set compared to the training set. A training set that is too small is highly likely to lead to over fitting instead. Furthermore, the requirement of an intimate connection to our evaluation metrics was another limiting factor in implementing the proposed method, as the evaluation is not fully packed in a standalone module and is largely based on independent notebook files.
 
