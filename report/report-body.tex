@@ -240,9 +240,9 @@ DCG is a measure of ranking quality. It is used to evaluate the ranking of retri
 
 \subsection{Analysis of Results} % (fold)
 \label{sub:analysis_of_results}
-Table 2 and 3 indicate the results of average precision, recall and F1 score of tests on algorithms with informational and navigational queries where informational queries include 'degree', 'jun wang' and 'alphago' and navigational queries inlcude 'moodle', 'computer graphical syllabus', 'bioinformatics home page' and 'information retrieval and data mining'  respectively. Algorithms include BM25, QueryLikelihood( QL), Boolean, TF-IDF, BM25 with Pagerank( BM25PG), TF-IDF with Pagerank( TF-IDFPG) and QL with Pagerank. There are totally about 100 links for each query and various number of relevant documents depending on the query.
+Table 2 and 3 indicate the results of average precision, recall and F1 score of tests on algorithms with informational and navigational queries where informational queries include 'degree', 'jun wang' and 'alphago' and navigational queries inlcude 'moodle', 'computer graphical syllabus', 'bioinformatics home page' and 'information retrieval and data mining'  respectively. Algorithms include BM25, QueryLikelihood( QL), Boolean, TF-IDF, BM25 with Pagerank( BM25PR), TF-IDF with Pagerank( TF-IDFPR) and QL with Pagerank. There are totally about 100 links for each query and various number of relevant documents depending on the query.
 
-It can be seen that without consideration of result ranking, the BM25 has the leading performance with both informational and navigational query. This could because that the penalty on term frequency and document length that BM25 implements helps to avoid retrieving non-relevant documents. Also, it strikes to the eyes that algorithms implemented with page ranking are actually worse than them along. One possible reason is that page rank depends on the number of anchors to the objective page, which means the more pages pointing to the objective page, the higher page rank it will receive. However, in our experiment, relevant documents to our queries might not be more popular than the non-relevant ones, therefore the page rank( QLPG) would be a noise while the search engine predicting the relevance. Although more test sets would be required to determine whether the combination is worse than the individual model.
+It can be seen that without consideration of result ranking, the BM25 has the leading performance with both informational and navigational query. This could because that the penalty on term frequency and document length that BM25 implements helps to avoid retrieving non-relevant documents. Also, it strikes to the eyes that algorithms implemented with page ranking are actually worse than them along. One possible reason is that page rank depends on the number of anchors to the objective page, which means the more pages pointing to the objective page, the higher page rank it will receive. However, in our experiment, relevant documents to our queries might not be more popular than the non-relevant ones, therefore the page rank( QLPR) would be a noise while the search engine predicting the relevance. Although more test sets would be required to determine whether the combination is worse than the individual model.
 
 Also, it is interesting to see that the number of recall of results retrieved by navigational queries is generally higher than it of informational queries. This is because that the nature of navigational queries restricts the number of relevant documents. For example, people are just looking for the login page  when they search for moodle and there are nearly no extra information about this term, so the relevant documents would be much fewer than relevant documents of, for example, computer science which is an informational term. Therefore, it is easier for search engine to retrieve most of pages that are relevant to the navigational queries than informational queries.
 
@@ -254,7 +254,7 @@ Also, it is interesting to see that the number of recall of results retrieved by
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|l|l|l|l|l|l|l|}
 \hline
-          & BM25  & QL & TF-IDF &Boolean& BM25PG &QLPG&TF-IDFPG  \\ \hline
+          & BM25  & QL & TF-IDF &Boolean& BM25PR &QLPR&TF-IDFPR  \\ \hline
 Precision & 0.7  & 0.36  & 0.66 & 0.59 &0.52&0.52&0.53 \\ \hline
 Recall    & 0.52& 0.49   & 0.51 & 0.5 &0.46&0.48&0.45 \\ \hline
 F1 score  & 0.58 & 0.28   & 0.55  & 0.52&0.47&0.49&0.47\\ \hline
@@ -271,13 +271,28 @@ F1 score  & 0.58 & 0.28   & 0.55  & 0.52&0.47&0.49&0.47\\ \hline
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|l|l|l|l|l|l|l|}
 \hline
-          & BM25  & QL & TF-IDF &Boolean& BM25PG &QLPG&TF-IDFPG  \\ \hline
+          & BM25  & QL & TF-IDF &Boolean& BM25PR &QLPR&TF-IDFPR  \\ \hline
 Precision & 0.67  & 0.64  & 0.6 & na  & 0.53 & 0.47 & 0.64 \\ \hline
 Recall    & 0.62& 0.57& 0.53& na& 0.5& 0.42& 0.58 \\ \hline
 F1 score  & 0.49& 0.44& 47& na& 0.31&0.26 & 0.43\\ \hline
 \end{tabular}%
 }
 \end{table}
+
+Last but not the least, figure 5 and 6 show the precision and recall plots with the query 'alphago' and 'degree'. It can be seen that every model could retrieve all documents relate to the query 'alpha', while performance of each model varies significantly to the query 'degree' although both queries are informational. This is because the term 'alphago' is still so new and unique that only pages relate to this topic would include this term, and the amount of these pages is also few, therefore, any model could easily retrieve them. In contrast, the term 'degree' is much more general and polular, hence even non-relevant pages might incude this term which would make it difficult for models to retrieve its relevant documents.
+\begin{figure}
+\centering
+\includegraphics[height=1in, width=1in]{figure5}
+\caption{precision recall plot of query 'alphago'}
+\vskip -6pt
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[height=1in, width=1in]{figure6}
+\caption{precision recall plot of query 'degree'}
+\vskip -6pt
+\end{figure}
 
 Table 3 shows the DCG of performances of each algorithms with different types of queires. BM25 still has significantly better performance than others. We could interpret that BM25 is the best algorithm among those seven. Again, it can be seen that DCG of results from navigational queries is generally higher than informational queries, and hence we can conclude that metrics are also depending on the type of queries rather than algorithm along. Beside, BM25 does not perform well for every search term although it has a better overall performance than other models. For example, For the term bioinformatics, the model BMPG could actually outperform it. Also, for the term alphago, since there are too few of relevant pages, nearly every model could find all of them and put them on the top of the list. 
 
@@ -289,12 +304,15 @@ Table 3 shows the DCG of performances of each algorithms with different types of
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|l|l|l|l|l|l|l|}
 \hline
-        & BM25  & QL & TF-IDF & Boolean&BM25PG &QLPG&TF-IDFPG \\ \hline
+        & BM25  & QL & TF-IDF & Boolean&BM25PR &QLPR&TF-IDFPR \\ \hline
 Informational& 8.57&7.6&7.4&3.9&4.9&5.1&5\\ \hline
-navigational& 13.4&10.1&7.4&na&8.6&7.4&10.9\\ \hline
+Navigational& 13.4&10.1&7.4&na&8.6&7.4&10.9\\ \hline
 \end{tabular}%
 }
 \end{table}
+
+
+Another aspect to take into consideration when evaluating performance of an algorithm is the time taken to rank the documents. Table \ref{tab:time} and \ref{tab:time_pr} shows the average time of 10 query words of different lengths, both with and without PageRank. Firstly, we can observe that BM25 spends considerably more time than the others. It is hard to explain the exact reason why it is spending almost double the time, but it might be caused by some implementation issues where for example the database gets called more than usual. Query likelihood seems to perform better than TF-IDF overall as well. It can also be observed a small increase in the timing when applying PageRank to the queries. This can especially be seen for the query likelihood where the time was increased by 42\%.
 
 \begin{table}[!h]
 \centering
@@ -321,9 +339,6 @@ QueryLikelihood & 1.23\\ \hline
 TF-IDF          & 2.109 \\ \hline
 \end{tabular}
 \end{table}
-
-Another aspect to take into consideration when evaluating performance of an algorithm is the time taken to rank the documents. Table \ref{tab:time} and \ref{tab:time_pr} shows the average time of 10 query words of different lengths, both with and without PageRank. Firstly, we can observe that BM25 spends considerably more time than the others. It is hard to explain the exact reason why it is spending almost double the time, but it might be caused by some implementation issues where for example the database gets called more than usual. Query likelihood seems to perform better than TF-IDF overall as well. It can also be observed a small increase in the timing when applying PageRank to the queries. This can especially be seen for the query likelihood where the time was increased by 42\%.
-
 
 % subsection analysis_of_results (end)
 
