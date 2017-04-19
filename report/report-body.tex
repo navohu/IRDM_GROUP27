@@ -201,16 +201,15 @@ We used Jelinek-Mercer Smoothing, in which the parameter $\lambda$ is a constant
 \subsection{Evaluation Metrics} % (fold)
 \label{sub:metrics_&_analysis}
 
-The evaluation is an important step to measure performance and will show whether the results of the algorithms conform with expected values. The most common metrics in evaluation within information retrieval is precision, recall and the F1 score. These three are the main evaluation algorithms used within this project. The evaluation is performed on all the ranking algorithms: Boolean retrieval, TF-IDF, BM25 and query likelihood. They are then evaluated in the case of using PageRank and the case without PageRank.
+The choice of evaluation metrics is central in measuring retrieval performance. A suitable metric quantifies how well the results of the algorithms conform with expected values. The most common metrics in evaluation within information retrieval are precision, recall and the F1 score. These three are the main evaluation methods used within this project. We have also reported Discounter Cumulative Gain (DCG). Each method will be explained in detail in the following subsections. The evaluation is performed on all the ranking algorithms: Boolean retrieval, TF-IDF, BM25 and query likelihood, both in the case of using PageRank and the case without PageRank.
 
 \subsubsection{Queries}
-Commonly, there are three types of search query people type into a search engine. These are 'informational queries', 'navigational queries' and 'transaction queries'. 
+Commonly, there are three types of search query people type into a search engine: \emph{informational queries}, \emph{navigational queries} and \emph{transactional queries}.
+Informational queries are normally defined as queries that give the user information about a certain topic, such as a specific place, person, items etc. These queries are normally used when the user is looking for a wider range of information related to the query rather than a specific website. Hence, a greater number of relevant documents should be retrieved by the informational queries than the transactional and navigational queries. Our test set includes informational queries 'jun wang', 'degree', 'alphaGO' and 'new research'. We chose these queries for their varying levels of generality such that we could compare the performances of engines with more specific as well as more general queries.
 
-Informational queries are normally defined as queries that gives the user information about a certain topic, such as a specific place, person, items etc. These queries are normally used when the user is looking for a wider range of information related to the query rather than a specific website. Hence, more relevant documents should be retrieved by the informational queries than the transactional and navigational queries. Our test sets would use 'jun wang' and 'degree' as the informational queries. The reason is that 'jun wang' is more specific than 'degree', therefore we could compare the performances of engines with specific and general queries.
+Navigational queries are frequently used when someone is trying to find a certain website or portal. For example, a user might enter 'Facebook' into the search bar to find the Facebook website rather than directly entering the url into the browser's navigational bar. Therefore, the navigational results should be ranked on the top for this kinds of queries. However, queries can be ambiguous, in which case they could be interpreted as either navigational or informational. For example, users who search for 'Facebook' might actually be looking for news of Facebook. We decided to use 'Moodle', 'bioinformatics home page' and 'computer graphics syllabus' to represent navigational queries.
 
-Navigational queries are frequently used when someone is trying to find a certain website or portal. For example, a user might enter 'Facebook' into the search bar to find the Facebook website rather than directly entering the url into the browser's navigational bar. Therefore, the navigational results should be ranked on the top for this kinds of queries. However, some queries that seem to be navigational in nature but might be not. For example, users who search for 'Facebook' might actually be looking for news of Facebook. We decided to use 'Moodle' to represent this kind of queries.
-
-A Transactional query shows an intend to complete a transaction, e.g. making a purchase or paying fees. We skipped this query since there are too few transactional links under the cs.ucl.ac.uk domain. 
+A transactional query shows an intent to complete a transaction, e.g. making a purchase or paying fees. We omitted this query category from our test set since it did not seem appropriate for our domain: there are too few transactional links under cs.ucl.ac.uk.
 
 \subsubsection{Recall, Precision and F1}
 Recall, precision and the F1 score are the most popular metrics to evaluate the performance of a search engine. Precision and recall are both inversely related which means that a high precision will normally give a lower recall and vice versa.
@@ -231,7 +230,7 @@ In our experiment, we would set the parameter to be the traditional value 0.5, a
 
 \[F1=2\cdot \frac{precision \cdot recall}{precision+recall}\]
 
-\subsubsection{Discounted Cumulative Gain( DCG)}
+\subsubsection{Discounted Cumulative Gain (DCG)}
 
 DCG is a measure of ranking quality. It is used to evaluate the ranking of retrieved documents based on their position in the result list. The gain is accumulated from the top of the list to the bottom with the gain of each result discounted at lower ranks. The higher the DCG value is, the better the ranking is, meaning that more relevant documents are displayed on top of the results list. The formula is as follow:
 
