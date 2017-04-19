@@ -2,7 +2,7 @@
 
 The end of the 20th century gave rise to a need to quickly obtain information on the World Wide Web. As a result of this, search engines were developed and are one of the most common methods to find information online today. Competition between different search engines has been present since the start, but Google has long ruled the market. Its has become widely used because its algorithms have outperformed those of other search engines. Not all of the algorithms that Google is using are publicly available, but those that are known have been present through decades, such as TF-IDF, BM25, PageRank and query likelihood ranking.
 
-The aim of this report is to explore existing algorithms for information retrieval and how they perform against each other. The search engine was implemented on the "cs.ucl.ac.uk" domain and includes several preprocessing techniques and data transformations. The application includes implementations of several ranking algorithms and an evaluation of the results. The search engine application built for this project can be found on \url{github.com/navohu/IRDM_GROUP27} and has been implemented in Python\footnote{All instructions for running the application can be found in the README file in the repository.}. Initially, our expectations for the project were to produce results that showed the difference of the current working algorithms, as well as an implementation of a deep learning algorithm. Since our project only included a search on the CS website it would imply that the amount of data might not be sufficient for a deep learning approach.
+The aim of this report is to explore existing algorithms for information retrieval and how they perform against each other. The search engine was implemented on the "cs.ucl.ac.uk" domain and includes several preprocessing techniques and data transformations. The application includes implementations of several ranking algorithms and an evaluation of the results. The search engine application built for this project can be found on \url{github.com/navohu/IRDM_GROUP27} and has been implemented in Python.\footnote{All instructions for running the application can be found in the README file in the repository.} Initially, our expectations for the project were to produce results that showed the difference of the current working algorithms, as well as an implementation of a deep learning algorithm. Since our project only included a search on the CS website it would imply that the amount of data might not be sufficient for a deep learning approach.
 
 
 
@@ -72,7 +72,7 @@ Based on these URLs, an inverted index is created, consisting of a dictionary th
 \subsubsection{Crawling} % (fold)
 \label{ssub:crawling}
 
-The crawling was done through an open source platform called Scrapy\footnote{https://scrapy.org} written in Python. This platform is given a start URL "\url{www.cs.ucl.ac.uk}", followed by a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. This would include pages such as "\url{www.cs.ucl.ac.uk/home}", and "\url{www.wiki.cs.ucl.ac.uk}". We set a \emph{maximum depth} of the crawler because we found some links that were extremely long only contained parts of the internal index of the CS website practically never opened by visitors to the website.
+The crawling was done through an open source platform called Scrapy written in Python.\footnote{https://scrapy.org} This platform is given a start URL "\url{www.cs.ucl.ac.uk}", followed by a depth-first-search on all links containing the "\url{cs.ucl.ac.uk}" domain. This would include pages such as "\url{www.cs.ucl.ac.uk/home}", and "\url{www.wiki.cs.ucl.ac.uk}". We set a \emph{maximum depth} of the crawler because we found some links that were extremely long only contained parts of the internal index of the CS website practically never opened by visitors to the website.
 
 The elements that were crawled from the website were the urls, titles ($<$h1$>$ tags) and the anchor text. This information, along with a unique identifier, was stored in the table \emph{cs\_sites}. We didn't crawl and store the content of the pages because of storage limitations. As long as all links of the domain are contained in the database, it is easy to access the content of each page at the indexing stage.
 
@@ -92,11 +92,13 @@ To map each word to the IDs of documents it appears in, and then reduce that set
 
 The ranking algorithms we applied on the inverted index can roughly be divided into two categories: standalone rankers and query-insensitive supplementary metrics. In the standalone category, we implemented Boolean retrieval, TF-IDF, BM25 and Query Likelihood ranking. In addition, we added an option to include PageRank scoring to augment the ranking of each of the former algorithms. PageRank itself belongs to the latter supplementary category, since it can not be directly used to retrieve results for a query, as it does not take query terms into consideration and depends on page features only.
 
+All of the standalone algorithms can be run within our app, with or without PageRank. In this way, differences in results returned by the algorithms and their respective ranks can be quickly noticed. A more systematic approach to measure the performance of the different ranking algorithms is through proper evaluation. This is explained in the next section.
+
 
 \subsubsection{PageRank} % (fold)
 \label{ssub:pagerank}
 
-The popular algorithm PageRank\footnote{https://en.wikipedia.org/wiki/PageRank} was developed by Google for ranking the results within a search engine. It is also commonly used for measuring the importance of a website. The algorithm is based on an assumption that more important websites are more likely to be pointed to from other websites.
+The popular algorithm PageRank was developed by Google for ranking the results within a search engine.\footnote{https://en.wikipedia.org/wiki/PageRank} It is also commonly used for measuring the importance of a website. The algorithm is based on an assumption that more important websites are more likely to be pointed to from other websites.
 
 The algorithm implies that it would need a way of representing connections between web sites. This can easily be done with the aid of an adjacency matrix. Firstly, all the connections needed to be measured, which was done by obtaining all the outgoing links for each site in \emph{cs\_sites}. Now, each link would point to a certain number of outgoing links disregarding whether they were in the \emph{cs.ucl.ac.uk} domain or not, but were filtered to eventually only hold links within the CS domain. From these connections an adjacency matrix was produced as shown as an example in Table \ref{fig:adj_mx}. 
 
@@ -159,9 +161,6 @@ where the IDF is defined as in subsection \ref{sub:tf_idf}. The same issue with 
 \label{ssub:query_likelihood_with_smoothing}
 
 % subsubsection query_likelihood_with_smoothing (end)
-
-All of these algorithms could be run within our app by choosing a parameter when executing the Python script. This way it is quick to see the differences between the different algorithms and to see whether they would give different results. A more systematic approach to measure the performance of the different ranking algorithms is through proper evaluation. This is explained in the next section.
-
 
 % subsection methods (end)
 
@@ -323,10 +322,5 @@ During the evaluation we had a limitation in our test set. The test set could be
 \label{sec:conclusion}
 
 % section conclusion (end)
-
-\section{References} % (fold)
-\label{sec:references}
-
-% section references (end)
 
 
