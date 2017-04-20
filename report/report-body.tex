@@ -89,6 +89,8 @@ The crawling was done through an open source platform called Scrapy written in P
 
 \begin{figure}[!h]
 \centering
+%\resizebox{\columnwidth}{!}
+%{
 \begin{tikzpicture}[-latex ,auto ,node distance =3cm and 2cm ,on grid ,
                     semithick , state/.style ={ circle ,top color =white , 
                     bottom color = white!20 , draw, black , 
@@ -103,6 +105,7 @@ The crawling was done through an open source platform called Scrapy written in P
 \path (B) edge [bend left =15] node[below =0.15 cm] {} (A);
 \path (C) edge [bend left =15] node[below =0.15 cm] {} (B);
 \end{tikzpicture}
+%}
 \caption{The figure shows a small transition diagram between three websites and how they are related to each other.}
 \label{fig:graph}
 \end{figure}
@@ -328,14 +331,18 @@ DCG is a further measure of ranking quality. It is used to evaluate the ranking 
 
 \subsection{Analysis of Results} % (fold)
 \label{sub:analysis_of_results}
-Our precision, recall and F1 score results are shown in Tables \ref{inform} and \ref{nav}. These scores are averaged by the query types according to the 3 informational and 4 navigational queries described it section \ref{sub:dataset_description}. Algorithms include benchmarks Google and UCL's search engine, as well as our implementations of BM25, Query Likelihood (QL), Boolean, TF-IDF, BM25 with PageRank (BM25PR), TF-IDF with PageRank (TF-IDFPR) and QL with PageRank (QLPR).
+Our precision, recall and F1 scores are shown in Tables \ref{inform} and \ref{nav}. These results are averaged by query type according to the 3 informational and 4 navigational queries described it section \ref{sub:dataset_description}. Algorithms include benchmarks, namely Google and UCL's search engine, as well as our implementations of BM25, Query Likelihood (QL), Boolean, TF-IDF, BM25 with PageRank (BM25PR), TF-IDF with PageRank (TF-IDFPR) and QL with PageRank (QLPR).
 
 \subsubsection{Ranking relevance}
-From our results, it can be seen that Google has the highest performance of all tested algorithms -- as expected. The UCL search engine also performs better than our implementations in many cases for both our navigational and informational queries. However, the BM25 ranking algorithm demonstrated better performance than the UCL search engine, which is a surprisingly good result. It can also be seen that TF-IDF had very similar results to the UCL search engine. The reason that BM25 performs better could potentially be because the test set that we produced might have a slight bias in favour of our models. Some of the web pages that were marked as relevant in our test set were included because they appeared in one some of the results that we received from our own search engine. Regardless of this fact, we made our own judgement on the relevance of these links to the query and it would have been ideal for the UCL engine to retrieve them as well. 
+From our results, it can be seen that Google has the highest performance of all tested algorithms -- as expected. The UCL search engine also performs better than our implementations in some cases for both our navigational and informational queries. However, the BM25 ranking algorithm was able to outperform the UCL search engine for the most part, which is a surprisingly good result. It can also be seen that TF-IDF had very comparable performance to the UCL search engine. However, our implementation of QL did not meet our expectations. Its relatively low performance, particularly on the informational test set, can largely be attributed to the threshold of zero we chose on the likelihood score of pages to retrieve. However, after smoothing, any page will have a non-zero score for any query whose terms are present in the collection due to the effect of the background probability. In hindsight, it would have been more sensible to automatically filter out any pages with no occurrences of the search terms, and doing this would significantly boost the scores observed for the QL ranking.
+
+The reason that BM25 performs better than UCL's search engine could potentially be because the test set that we produced might have a slight bias in favour of our models. Some of the web pages that were marked as relevant in our test set were included because they appeared in one some of the results that we received from our own search engine. Regardless of this fact, we made our own judgement on the relevance of these links to the query and it would have been ideal for the UCL engine to retrieve them as well. 
 
 When considering the performances of our own algorithms, BM25 has a higher performance on both the informational and navigational queries. The reason of this could be caused by the penalty BM25 has on term frequency and document length in order to avoid retrieving non-relevant documents. Surprisingly, algorithms implemented with PageRank actually performed worse than the ones without. A possible reason might be our choice of web pages to include. The CS domain might not have a sufficient number of pages pointing to each other to support the theorem that PageRank is built upon, namely that important pages have a high long term visit rate. More test sets would be necessary in order to conclusively determine whether using PageRank is better or worse than the individual models without PageRank. 
 
-It is also interesting to observe that the recall values from the navigational queries are generally higher than the ones from the informational queries. This is because navigational queries naturally restrict the number of relevant documents. For example, a user might expect to be presented with the Moodle login page with the query "moodle". Since there is little more to the intent of this query, the relevant documents would be very few in number. In the case of a query such as "computer science", the number of relevant documents is expected to be much higher. Therefore, it is easier for the search engine to retrieve a higher fraction of the relevant documents for the navigational queries than the informational queries. \\
+It is also interesting to observe that the recall values from the navigational queries are generally higher than the ones from the informational queries. This is because navigational queries naturally restrict the number of relevant documents. For example, a user might expect to be presented with the Moodle login page with the query "moodle". Since there is little more to the intent of this query, the relevant documents would be very few in number. In the case of a query such as "computer science", the number of relevant documents is expected to be much higher. Therefore, it is easier for the search engine to retrieve a higher fraction of the relevant documents for the navigational queries than the informational queries.
+
+Tables \ref{inform} and \ref{nav} also show the DCG of performances of each of the algorithms with different types of queries. BM25 also performs significantly better in this metric than other algorithms, and we can conclude that BM25 is the best algorithm among the seven we evaluated. Again, it can be seen that the DCG of the results from navigational queries is generally higher than informational queries. This shows that performance metrics also depend on the type of the query in addition to the ranking algorithm. We can see that BM25 does not perform well for every search term even though it has a better overall performance than other models. For example, for the query "bioinformatics home page", our BM25PR model performed better than plain BM25.
 
 \begin{figure*}[!t]
     \centering
@@ -358,8 +365,6 @@ It is also interesting to observe that the recall values from the navigational q
 \end{figure*}
 
 To further contrast the performance between algorithms, Figures \ref{fig:junwang} and \ref{fig:alphago} show the precision and recall curves with the queries "Jun Wang" and "AlphaGo", respectively. We plotted our models producing the most interesting curves against those of Google and the UCL search engine. It can be seen that each one of the models was able to retrieve all documents related to the query "AlphaGo", while their performance significantly varies for "Jun Wang" although both queries are of the informational type. The reason for this is that the term "AlphaGo" is novel and specific; as such, it only occurs in a handful of documents. In our collection, "AlphaGo" was only contained in four pages, which all of the models were able to retrieve. In contrast, the term "Jun Wang" is much more general and frequently occurring, hence even non-relevant pages might include the individual terms in the query, which would make it difficult for models to separate these from the relevant documents.
-
-Table \ref{dcg} shows the DCG of performances of each of the algorithms with different types of queries. BM25 still has significantly better performance than the others, and we could easily interpret that BM25 is the best algorithm among the seven we evaluated. Again, it can be seen that the DCG of the results from navigational queries is generally higher than informational queries. This shows that performance metrics also depend on the type of the query in addition to the ranking algorithm. We can see that BM25 does not perform well for every search term even though it has a better overall performance than other models. For example, for the query "bioinformatics home page", our BM25+PR model performed better than plain BM25.
 
 \subsubsection{Ranking time}
 
