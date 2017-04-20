@@ -260,11 +260,11 @@ DCG is a further measure of ranking quality. It is used to evaluate the ranking 
 
 \begin{table*}[!t]
     \captionsetup{width=0.8\textwidth}
-    \caption{Results of explored algorithms by means of different metrics. \ref{inform} shows results for our informational queries, \ref{nav} displays results for our navigational test set and \ref{time} lists the ranking time taken by each algorithm.}
+    \caption{Results of explored algorithms by means of different metrics. \ref{inform} shows results for our informational queries, \ref{nav} displays them for our navigational test set and \ref{time} lists the ranking time taken by each algorithm.}
     \label{fig:results}
     \begin{subtable}{0.8\textwidth}
     \centering
-    \caption{Results by informational queries}
+    \caption{Results on informational queries}
     \label{inform}
     \resizebox{\columnwidth}{!}
     {
@@ -282,7 +282,7 @@ DCG is a further measure of ranking quality. It is used to evaluate the ranking 
 
     \begin{subtable}{0.8\textwidth}
     \centering
-    \caption{Results by navigational queries}
+    \caption{Results on navigational queries}
 
     \label{nav}
     \resizebox{\columnwidth}{!}
@@ -380,15 +380,18 @@ Firstly, we can observe that BM25 spends considerably more time than the others.
 \label{sec:discussion_&_limitations}
 
 Different type of implementation of TF-IDF and BM25, but we have only chosen some. 
-Our project has so far only considered a subset of existing algorithms. In order to get a wider picture of the different algorithms, it could be a good idea to include even more ranking algorithms. Also, some additional weighting algorithms could also be included in order to increase the accuracy of our results, such as HITS algorithm.
+Our project has so far only considered a subset of existing algorithms. In order to get a wider picture of the different algorithms, it could be a good idea to include even more ranking algorithms. Also, some additional weighting algorithms could also be included in order to increase the accuracy of our results, such as the HITS algorithm.
 
-One of the major limitations in this project was circled around the crawler. The framework Scrapy was not written by us and we would not necessarily know that the crawler did exactly what we asked for. Scrapy retrieved lower amount of pages that expected and therefore made us question its quality. Since this was discovered relatively late, there were no time to try to get used to a new framework. Hence, when analysing the results it must be taken into consideration that the crawler might not have caught all the links in the CS domain. Also the problem with not crawling everything might have been because a max depth was set. Although the crawler indicated that it would take around 20 days without the depth, a further look into improving this should be made.
+One of the major limitations in this project was imposed by the crawler. The Scrapy framework was not written by us and hence it was challenging to tell whether the crawler was doing exactly what we wanted it to. Scrapy retrieved fewer pages than we expected, which made us question its validity. Since we discovered this relatively late, there was not enough time to try to learn a new framework. Therefore, when analysing the results, it must be taken into consideration that the crawler might not have caught all the links in the CS domain. Also the problem with not crawling everything might have been because a maximum depth was set. Although the crawling would likely have taken around 20 days to complete at its current rate without the depth limit, a further look into improving this should be made. Only running the crawling once also compromised the freshness of our index compared to commercial search engines such as Google, which are able to frequently re-crawl their domain.
 
 Another aspect that is important to discuss is the reason of why the PageRank affected our results negatively. The assumption that more important documents have a higher long-term visit rate might hold when including all of the existing pages on the web. When narrowing it down to such a small dataset which only included the CS domain, the assumption might not hold. It could be the case that the CS domain points towards more links outside the domain than links within the domain itself. This is an interesting discovery and it would appealing to research whether this is a fact in the general case.
 
-During the evaluation we had a limitation in our test set. The test set could be increased to compare even more queries, but because of time limitation we were not able to implement any more queries. This limits the credibility of our results, even though they are still sufficient to some extent.
+The main limitation in our evaluation procedure was the restricted size of our test set. The number of queries could be increased further, but because of limited time, we were not able to manually label any more queries. This affects the generality of our results, even though they are sufficient to some extent nonetheless.\\
 
 Because of time restrictions, we also had to leave out a deep learning based ranking algorithm we were hoping to build. Although we do not have an implementation, we had a vision of how we wanted to design this ranker. It would be based on a deep neural network that would receive the scores of each of our 5 models, including PageRank, as input. To further increase the number of features, our second index with raw (unstemmed) document terms could be used, as well. The network would then weight the given scores appropriately such that its output rankings would match the labeled rankings of a training set as closely as possible. In this way, it would have been able to take advantage of the respective strengths of each of our algorithms while compensating for their individual weaknesses.
+
+ However, a further limitation that would have made an application of deep learning difficult in our case was the manually defined set of test queries. When training a large neural network for the general task of ranking search results, a large amount of data is needed to achieve comparable performance on an unseen test set compared to the training set. A training set that is too small is highly likely to lead to over fitting instead. Furthermore, the requirement of an intimate connection to our evaluation metrics was another limiting factor in implementing the proposed method, as the evaluation is not fully packed in a standalone module and is largely based on independent notebook files.
+
 
 % section discussion_&_limitations (end)
 
@@ -397,8 +400,7 @@ Because of time restrictions, we also had to leave out a deep learning based ran
 
 From our results, it can be concluded that our search engine behaves in a desirable way. It successfully retrieves relevant documents to our queries and BM25 managed to achieve precision results up to 70\%, as well as recall results up to 62\%. Our search engine also shows that the BM25 was able to outperform the UCL search engine. The goal of the project was to rank and compare different models, which has been achieved by crawling and indexing the CS domain and implementing five main algorithms. The four standalone algorithms Boolean Retrieval, TF-IDF, BM25, Query Likelihood behaved in an expected manner according to previous work in the field. One surprising conclusion from the results was how PageRank did not add any value to retrieving relevant documents for our document collection, but instead decreased both precision and recall values for all the ranking algorithms. 
 
-For future work we believe our deep learning assisted ranking could have been a novel contribution to the problem of IR, as no other model is likely to be built up of exactly our choice of features, and converge on the exact same weights in the training process, especially given our original test set. However, one limitation that would have made an application of deep learning difficult in our case was the manually defined set of test queries. When training a large neural network for the general task of ranking search results, a large amount of data is needed to achieve comparable performance on an unseen test set compared to the training set. A training set that is too small is highly likely to lead to over fitting instead. Furthermore, the requirement of an intimate connection to our evaluation metrics was another limiting factor in implementing the proposed method, as the evaluation is not fully packed in a standalone module and is largely based on independent notebook files.
-
+For future work, we believe our deep learning assisted ranking could have been a novel contribution to the problem of IR, as no other model is likely to be built up of exactly our choice of features, and converge on the exact same weights in the training process, especially given our original test set.
 % section conclusion (end)
 
 
