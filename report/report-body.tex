@@ -248,7 +248,7 @@ However, it does not make sense to pursue 100\% recall by returning all document
 
 The F1 score, on the other hand, is a good single measure for the accuracy of the results of the given search engine. It considers both precision and recall when computing its score. The general formula of the F1 score is shown below:
 
-\[F1=(1+\beta^{2})\cdot \frac{precision\cdot recall}{(\beta^{2}\cdot precision)+recall}\]
+\[F1=\frac{1}{\beta \cdot \frac{1}{precision}+(1-\beta)\cdot \frac{1}{recall}}\]
 
 In our experiment, we set the parameter $\beta$ to the conventional value 0.5, changing the formula to become as follows:
 
@@ -268,12 +268,12 @@ DCG is a further measure of ranking quality. It is used to evaluate the ranking 
     \label{inform}
     \resizebox{\columnwidth}{!}
     {
-      \begin{tabular}{|l|l|l|l|l|l|l|l|}
+      \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
       \hline
-                & BM25  & QL & TF-IDF &Boolean& BM25PR &QLPR&TF-IDFPR  \\ \hline
-      Precision & 0.7  & 0.36  & 0.66 & 0.59 &0.52&0.52&0.53 \\ \hline
-      Recall    & 0.52& 0.49   & 0.51 & 0.5 &0.46&0.48&0.45 \\ \hline
-      F1 score  & 0.58 & 0.28   & 0.55  & 0.52&0.47&0.49&0.47\\ \hline
+                & BM25  & QL & TF-IDF &Boolean& BM25PR &QLPR&TF-IDFPR&Google&ucl  \\ \hline
+      Precision & 0.7  & 0.36  & 0.66 & 0.59 &0.52&0.52&0.53&0.83&0.67 \\ \hline
+      Recall    & 0.52& 0.49   & 0.51 & 0.5 &0.46&0.48&0.45&0.72&0.51 \\ \hline
+      F1 score  & 0.68 & 0.42   & 0.55  & 0.52&0.47&0.49&0.47&0.77&0.579\\ \hline
       \end{tabular}
     }
     \end{subtable}%
@@ -284,12 +284,12 @@ DCG is a further measure of ranking quality. It is used to evaluate the ranking 
     \label{nav}
     \resizebox{\columnwidth}{!}
     {
-      \begin{tabular}{|l|l|l|l|l|l|l|l|}
+      \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
       \hline
-                & BM25  & QL & TF-IDF &Boolean& BM25PR &QLPR&TF-IDFPR  \\ \hline
-      Precision & 0.67  & 0.64  & 0.6 & 0.48  & 0.53 & 0.47 & 0.64 \\ \hline
-      Recall    & 0.62& 0.57& 0.53& 0.51& 0.5& 0.42& 0.58 \\ \hline
-      F1 score  & 0.49& 0.44& 47& 0.36& 0.31&0.26 & 0.43\\ \hline
+                & BM25  & QL & TF-IDF &Boolean& BM25PR &QLPR&TF-IDFPR &google&ucl \\ \hline
+      Precision & 0.67& 0.64& 0.6 &0.48& 0.53 & 0.47 & 0.64&0.82&0.62 \\ \hline
+      Recall    & 0.62& 0.57& 0.53& 0.51&0.5& 0.42& 0.58 &0.71&0.58\\ \hline
+      F1 score  & 0.64& 0.60& 0.56& 0.49& 0.51&0.44 & 0.6&0.0.76&0.6\\ \hline
       \end{tabular}
     }
     \end{subtable}
@@ -298,11 +298,11 @@ DCG is a further measure of ranking quality. It is used to evaluate the ranking 
     \caption{DCG of models}
     \label{dcg}
     \resizebox{\columnwidth}{!}{
-    \begin{tabular}{|l|l|l|l|l|l|l|l|}
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
     \hline
-            & BM25  & QL & TF-IDF & Boolean&BM25PR &QLPR&TF-IDFPR \\ \hline
-    Informational& 8.57&7.6&7.4&3.9&4.9&5.1&5\\ \hline
-    Navigational& 13.4&10.1&7.4&6.9&8.6&7.4&10.9\\ \hline
+            & BM25  & QL & TF-IDF & Boolean&BM25PR &QLPR&TF-IDFPR&google&ucl \\ \hline
+    Informational& 8.57&7.6&7.4&3.9&4.9&5.1&5.3&10.7&9.23\\ \hline
+    Navigational& 13.4&10.1&7.4&6.9&8.6&7.4&10.9&14.27&12.8\\ \hline
     \end{tabular}
     }
     \end{subtable}%
@@ -324,10 +324,12 @@ DCG is a further measure of ranking quality. It is used to evaluate the ranking 
 
 \subsection{Analysis of Results} % (fold)
 \label{sub:analysis_of_results}
-Our precision, recall and F1 score results are shown in table \ref{inform} and \ref{nav}. These scores are averaged by the query types according to the 3 informational and 4 navigational queries described it section \ref{sub:dataset_description}. Algorithms include BM25, Query Likelihood (QL), Boolean, TF-IDF, BM25 with PageRank (BM25PR), TF-IDF with PageRank (TF-IDFPR) and QL with PageRank (QLPR).
+Our precision, recall and F1 score results are shown in table \ref{inform} and \ref{nav}. These scores are averaged by the query types according to the 3 informational and 4 navigational queries described it section \ref{sub:dataset_description}. Algorithms include benchmarks (Google, uclBM25), Query Likelihood (QL), Boolean, TF-IDF, BM25 with PageRank (BM25PR), TF-IDF with PageRank (TF-IDFPR) and QL with PageRank (QLPR).
 
 \subsubsection{Ranking relevance}
-The tables indicates that BM25 has a higher performance on both the informational and navigational queries. The reason of this could be caused by the penalty on the BM25 has on term frequency and document length in order to avoid retrieving non-relevant documents. Surprisingly, algorithms implemented with PageRank actually perform worse than the ones without. A possible reason might be of the origin of our web pages. The CS domain might not have as many pointing pages to hold the theorem that PageRank builds upon, namely that more popular pages has a higher long term visit rate.  More test sets would be necessary in order to determine whether the combination of the use of PageRank is better or worse than the individual model without PageRank.
+Firstly, Google does have a leading performance among all our algorithms and ucl search engine for both navigational and informational queries. BM25 has the second highest performance which mean it beats the UCL search engine. This could because algorithms we used could also retrieve link that can only be found by google or ucl when the user is using a smartphone. For example, the link 'http://www.cs.ucl.ac.uk/mobile/archive/article/media-futures-group-research-wins-best-paper-award/' is relevant to the query 'junwang' and retrieved by our algorithms, but neither of ucl or google search engine got it. Therefore, the dataset would be biased to our models unless data pre-processing is used to separate mobile links from the main datasets. That could be done in any further development.
+
+Among performances of our own algorithms, BM25 has a higher performance on both the informational and navigational queries. The reason of this could be caused by the penalty on the BM25 has on term frequency and document length in order to avoid retrieving non-relevant documents. Surprisingly, algorithms implemented with PageRank actually perform worse than the ones without. A possible reason might be of the origin of our web pages. The CS domain might not have as many pointing pages to hold the theorem that PageRank builds upon, namely that more popular pages has a higher long term visit rate.  More test sets would be necessary in order to determine whether the combination of the use of PageRank is better or worse than the individual model without PageRank.
 
 It is also interesting to observe that the recall values from the navigational queries is generally higher than the ones from the informational queries. This is because the navigational queries naturally restricts the number of relevant documents. For example, a user might expect the Moodle login page with the query 'moodle'. Since there are almost no extra information about this query the relevant documents would be very few. In the case of using a query such as "computer science" the number of relevant documents are expected to be much higher. Therefore, it is easier for the search engine to retrieve more relevant documents for the navigational queries than the informational queries.
 
@@ -336,8 +338,8 @@ It is also interesting to observe that the recall values from the navigational q
     \begin{subfigure}{0.5\textwidth}
         \centering
         \includegraphics[width=\linewidth]{figure5}
-        \caption{Precision/recall plot of query 'degree'}
-        \label{fig:degree}
+        \caption{Precision/recall plot of query 'junwang'}
+        \label{fig:junwang}
         \vskip -6pt
     \end{subfigure}%
     ~ 
@@ -351,7 +353,7 @@ It is also interesting to observe that the recall values from the navigational q
     \caption{Precision/recall curves for two example queries.}
 \end{figure*}
 
-Figure \ref{fig:degree} and \ref{fig:alphago} show the precision and recall plots with the query 'AlphaGo' and 'degree'. It can be seen that every model could retrieve all documents relate to the query 'AlphaGo', while performance of each model varies significantly to the query 'degree' although both queries are informational. The reason of this phenomenon is because the term 'AlphaGo' is still so new and unique that only a handful of pages that are actually using this term. Since the amount of documents in the collection that included the query 'AlphaGo' was only four documents, all of the models could easily retrieve them. In contrast, the term 'degree' is much more general and popular, hence even non-relevant pages might include this term which would make it difficult for models to retrieve its relevant documents.
+Figure \ref{fig:junwang} and \ref{fig:alphago} show the precision and recall plots with the query 'AlphaGo' and 'junwang'. Due to there are too many models, we only plotted some of them with performances of google and ucl. It can be seen that every model could retrieve all documents relate to the query 'AlphaGo', while performance of each model varies significantly to the query 'junwang' although both queries are informational. The reason of this phenomenon is because the term 'AlphaGo' is still so new and unique that only a handful of pages that are actually using this term. Since the amount of documents in the collection that included the query 'AlphaGo' was only four documents, all of the models could easily retrieve them. In contrast, the term 'junwang' is much more general and popular, hence even non-relevant pages might include this term which would make it difficult for models to retrieve its relevant documents.
 
 Table \ref{dcg} shows the DCG of performances of each of the algorithms with different types of queries. BM25 still has significantly better performance than the others, and we could easily interpret that BM25 is the best algorithm among those seven. Again, it can be seen that the DCG of the results from navigational queries is generally higher than informational queries, hence we could interpret this to that the metrics are also depending on the type of the query rather than only the specific ranking algorithm. Beside, BM25 does not perform well for every search term although it has a better overall performance than other models. For example, the term 'bioinformatics' was outperformed by the BMPG model.
 
