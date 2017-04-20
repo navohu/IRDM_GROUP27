@@ -106,7 +106,7 @@ The crawling was done through an open source platform called Scrapy written in P
 \path (C) edge [bend left =15] node[below =0.15 cm] {} (B);
 \end{tikzpicture}
 %}
-\caption{The figure shows a small transition diagram between three websites and how they are related to each other.}
+\caption{An illustrative transition diagram between three websites.}
 \label{fig:graph}
 \end{figure}
 
@@ -142,19 +142,19 @@ The popular algorithm PageRank was developed by Google for ranking the results w
 
 It follows that PageRank needs a way of representing connections between web sites. This can easily be done with the aid of an adjacency matrix. Firstly, all the connections needed to be measured, which was done by obtaining all the outgoing links for each site in \emph{cs\_sites}. At this stage, each page pointed to a certain number of other websites,
 %regardless of whether they were in the \emph{cs.ucl.ac.uk} domain or not, but were
-which we filtered down to links within the CS domain only. From these connections, an adjacency matrix was produced, an example of which is shown in Table \ref{fig:adj_mx}. 
+which we filtered down to links within the CS domain only. From these connections, an adjacency matrix was produced, an example of which is shown in Table \ref{fig:adj_mx}. For a larger domain such as ours, this matrix is likely to be very sparse, as most pairs of websites are not directly connected.
 
 \begin{table}[!t]
   \centering
-  \caption{Adjacency matrix between links A, B and C. The number 1 represents a connection, while 0 represents no connection.}
+  \caption{Adjacency matrix matching Figure 1, where A = \emph{cs.ucl.ac.uk}, B = \emph{cs.ucl.ac.uk/home} and C = \emph{cs.ucl.ac.uk/research}. The number 1 represents a hyperlink, while 0 represents no hyperlink.}
   \begin{tabular}{|lr|c|c|c|} \cline{3-5}
   \multicolumn{1}{l}{} && \multicolumn{3}{c|}{To} \\ \cline{3-5}
   \multicolumn{1}{l}{} & & A & B & C  \\ \hline
   \multirow{3}{*}{\begin{sideways}From\end{sideways}}
   %                           A   B   C   
-  & \multicolumn{1}{|r|}{A} & 0 & 0 & 1  \\ \cline{2-5}
-  & \multicolumn{1}{|r|}{B} & 0 & 1 & 1  \\ \cline{2-5}
-  & \multicolumn{1}{|r|}{C} & 1 & 1 & 0  \\ \hline
+  & \multicolumn{1}{|r|}{A} & 1 & 1 & 1  \\ \cline{2-5}
+  & \multicolumn{1}{|r|}{B} & 1 & 0 & 1  \\ \cline{2-5}
+  & \multicolumn{1}{|r|}{C} & 1 & 0 & 0  \\ \hline
   \end{tabular}
   \label{fig:adj_mx}
 \end{table}
