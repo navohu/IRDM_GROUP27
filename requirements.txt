@@ -5,6 +5,6 @@ html2text==2016.9.19
 networkx==1.11
 nltk==3.2.2
 psycopg2==2.7.1
-requests==1.2.3
+requests==2.20.0
 scikit-learn==0.18.1
 urllib3==1.8.2
